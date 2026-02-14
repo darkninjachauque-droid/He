@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -8,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Github, Loader2 } from 'lucide-react';
+import { Lock, Mail, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function AuthScreen() {
@@ -43,9 +42,14 @@ export function AuthScreen() {
   const handleGoogleSignIn = async () => {
     if (!auth) return;
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Erro com Google", description: error.message });
+      toast({ 
+        variant: "destructive", 
+        title: "Erro com Google", 
+        description: error.message 
+      });
     }
   };
 
@@ -56,9 +60,9 @@ export function AuthScreen() {
           <div className="mx-auto bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
             <Lock className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold">{isLogin ? 'Bem-vindo de volta' : 'Criar conta'}</CardTitle>
+          <CardTitle className="text-2xl font-bold">{isLogin ? 'Acesso ao Vault' : 'Criar conta'}</CardTitle>
           <CardDescription>
-            {isLogin ? 'Entre para acessar seus arquivos privados.' : 'Cadastre-se para começar a guardar seus arquivos.'}
+            {isLogin ? 'Entre para acessar seus arquivos pessoais.' : 'Cadastre-se para começar a guardar seus arquivos.'}
           </CardDescription>
         </CardHeader>
         <CardContent>

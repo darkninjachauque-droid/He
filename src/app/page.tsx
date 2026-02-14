@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useUser } from '@/firebase';
@@ -25,7 +24,7 @@ export default function HomePage() {
         {user ? <FileManager user={user} /> : <AuthScreen />}
       </main>
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} Meu Armazém Privado. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} Meu Vault Privado. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
