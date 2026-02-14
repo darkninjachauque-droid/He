@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, ShieldAlert } from 'lucide-react';
+import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -56,16 +56,19 @@ export function AuthScreen() {
     const errorMsg = error.message || '';
     const errorCode = error.code || '';
     
+    // Erro de API não ativada no projeto
     if (errorMsg.includes('identity-toolkit-api-has-not-been-used') || errorCode.includes('api-not-enabled')) {
       setApiError({
         type: 'enable',
         message: 'A API de Autenticação ainda não foi ativada. Clique no botão abaixo para ativar agora.',
         link: 'https://console.developers.google.com/apis/api/identitytoolkit.googleapis.com/overview?project=104601029201'
       });
-    } else if (errorMsg.includes('blocked') || errorCode.includes('requests-to-this-api-identitytoolkit-are-blocked')) {
+    } 
+    // Erro de Chave de API restrita (o caso da sua foto)
+    else if (errorMsg.includes('blocked') || errorCode.includes('requests-to-this-api-identitytoolkit-are-blocked')) {
       setApiError({
         type: 'blocked',
-        message: 'A API foi ativada, mas o acesso está sendo bloqueado por restrições de chave. No console do Google Cloud, vá em "APIs e Serviços > Credenciais", clique na sua chave de API e remova as restrições ou adicione "Identity Toolkit API" à lista de permitidas.',
+        message: 'A chave de API está restringindo o acesso. Na tela que você abriu (Editar chave), mude para "Não restringir a chave" ou adicione "Identity Toolkit API" na lista de APIs permitidas.',
         link: 'https://console.cloud.google.com/apis/credentials?project=104601029201'
       });
     } else {
@@ -85,32 +88,35 @@ export function AuthScreen() {
         </div>
         <h1 className="text-3xl font-bold tracking-tight">MeuVault</h1>
         <p className="text-muted-foreground max-w-xs mx-auto">
-          Armazenamento privado e seguro para seus arquivos pessoais.
+          Cofre pessoal para seus arquivos com segurança máxima.
         </p>
       </div>
 
       <Card className="w-full max-w-md shadow-2xl border-none bg-card/50 backdrop-blur-sm">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-xl font-bold">{isLogin ? 'Bem-vindo de volta' : 'Criar sua conta'}</CardTitle>
+          <CardTitle className="text-xl font-bold">{isLogin ? 'Acessar meu Cofre' : 'Criar Conta Privada'}</CardTitle>
           <CardDescription>
-            {isLogin ? 'Identifique-se para acessar seu cofre.' : 'Comece a proteger seus arquivos agora mesmo.'}
+            {isLogin ? 'Faça login para gerenciar seus arquivos.' : 'Proteja seus documentos agora mesmo.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {apiError && (
             <Alert variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
               {apiError.type === 'blocked' ? <ShieldAlert className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-              <AlertTitle>{apiError.type === 'blocked' ? 'Acesso Bloqueado' : 'Configuração Necessária'}</AlertTitle>
+              <AlertTitle className="font-bold">
+                {apiError.type === 'blocked' ? 'Restrição de Chave Detectada' : 'Configuração Necessária'}
+              </AlertTitle>
               <AlertDescription className="space-y-3">
                 <p className="text-xs leading-relaxed">{apiError.message}</p>
                 <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90" asChild>
                   <a href={apiError.link} target="_blank" rel="noopener noreferrer">
-                    {apiError.type === 'blocked' ? 'Verificar Chave de API' : 'Ativar no Google Console'} <ExternalLink className="ml-2 h-3 w-3" />
+                    {apiError.type === 'blocked' ? 'Corrigir Restrição de Chave' : 'Ativar API no Google'} <ExternalLink className="ml-2 h-3 w-3" />
                   </a>
                 </Button>
-                <p className="text-[10px] text-muted-foreground italic text-center">
-                  Após ajustar, aguarde 2 minutos e tente novamente.
-                </p>
+                <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground italic">
+                  <Loader2 className="h-2 w-2 animate-spin" />
+                  <span>Após salvar no Google, aguarde 5 minutos para o efeito.</span>
+                </div>
               </AlertDescription>
             </Alert>
           )}
@@ -173,7 +179,7 @@ export function AuthScreen() {
             </div>
             <Button type="submit" className="w-full h-11 text-base font-semibold shadow-lg shadow-primary/20" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLogin ? 'Entrar' : 'Criar Conta'}
+              {isLogin ? 'Entrar no Vault' : 'Criar Conta'}
             </Button>
           </form>
         </CardContent>
@@ -184,9 +190,10 @@ export function AuthScreen() {
         </CardFooter>
       </Card>
       
-      <p className="mt-8 text-xs text-muted-foreground text-center">
-        Seus arquivos são criptografados e protegidos por autenticação de nível industrial.
-      </p>
+      <div className="mt-8 flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+        <CheckCircle2 className="h-3 w-3 text-green-500" />
+        <span>Criptografia de Ponta a Ponta Ativa</span>
+      </div>
     </div>
   );
 }
