@@ -1,0 +1,10 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-illustration",
+      "description": "Abstract security and data fusion illustration",
+      "imageUrl": "https://picsum.photos/seed/apkfusion1/800/400",
+      "imageHint": "security abstract"
+    }
+  ]
+}
