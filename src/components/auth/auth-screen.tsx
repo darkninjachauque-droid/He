@@ -18,7 +18,7 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [apiError, setApiError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<{ message: string; link: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,9 +53,12 @@ export function AuthScreen() {
   };
 
   const handleAuthError = (error: any) => {
-    console.error("Auth Error:", error.code, error.message);
-    if (error.message.includes('identity-toolkit-api-has-not-been-enabled')) {
-      setApiError('A API de Autenticação precisa ser ativada no seu console do Google Cloud/Firebase.');
+    const errorMsg = error.message || '';
+    if (errorMsg.includes('identity-toolkit-api-has-not-been-used') || errorMsg.includes('identitytoolkit.googleapis.com')) {
+      setApiError({
+        message: 'A API de Autenticação precisa ser ativada no seu console do Google Cloud.',
+        link: 'https://console.developers.google.com/apis/api/identitytoolkit.googleapis.com/overview?project=104601029201'
+      });
     } else {
       toast({
         variant: "destructive",
@@ -71,9 +74,9 @@ export function AuthScreen() {
         <div className="mx-auto bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
           <ShieldCheck className="h-10 w-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">Cofre Digital</h1>
+        <h1 className="text-3xl font-bold tracking-tight">MeuVault</h1>
         <p className="text-muted-foreground max-w-xs mx-auto">
-          Armazenamento privado e criptografado para seus documentos importantes.
+          Armazenamento privado e seguro para seus arquivos pessoais.
         </p>
       </div>
 
@@ -81,19 +84,19 @@ export function AuthScreen() {
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-xl font-bold">{isLogin ? 'Bem-vindo de volta' : 'Criar sua conta'}</CardTitle>
           <CardDescription>
-            {isLogin ? 'Identifique-se para acessar seus arquivos.' : 'Comece a proteger seus arquivos agora mesmo.'}
+            {isLogin ? 'Identifique-se para acessar seu cofre.' : 'Comece a proteger seus arquivos agora mesmo.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {apiError && (
             <Alert variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Configuração Pendente</AlertTitle>
-              <AlertDescription className="space-y-2">
-                <p className="text-xs">{apiError}</p>
-                <Button variant="link" className="p-0 h-auto text-xs text-destructive underline" asChild>
-                  <a href="https://console.cloud.google.com/apis/library/identitytoolkit.googleapis.com" target="_blank" rel="noopener noreferrer">
-                    Ativar no Google Console <ExternalLink className="ml-1 h-3 w-3" />
+              <AlertTitle>Configuração Necessária</AlertTitle>
+              <AlertDescription className="space-y-3">
+                <p className="text-xs leading-relaxed">{apiError.message}</p>
+                <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90" asChild>
+                  <a href={apiError.link} target="_blank" rel="noopener noreferrer">
+                    Ativar no Google Console <ExternalLink className="ml-2 h-3 w-3" />
                   </a>
                 </Button>
               </AlertDescription>
@@ -134,7 +137,7 @@ export function AuthScreen() {
                 <Input 
                   id="email" 
                   type="email" 
-                  placeholder="nome@exemplo.com" 
+                  placeholder="seu@email.com" 
                   className="pl-10 h-11" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
