@@ -56,7 +56,6 @@ export function AuthScreen() {
     const errorMsg = error.message || '';
     const errorCode = error.code || '';
     
-    // Erro de API não ativada no projeto
     if (errorMsg.includes('identity-toolkit-api-has-not-been-used') || errorCode.includes('api-not-enabled')) {
       setApiError({
         type: 'enable',
@@ -64,11 +63,10 @@ export function AuthScreen() {
         link: 'https://console.developers.google.com/apis/api/identitytoolkit.googleapis.com/overview?project=104601029201'
       });
     } 
-    // Erro de Chave de API restrita (o caso da sua foto)
     else if (errorMsg.includes('blocked') || errorCode.includes('requests-to-this-api-identitytoolkit-are-blocked')) {
       setApiError({
         type: 'blocked',
-        message: 'A chave de API está restringindo o acesso. Na tela que você abriu (Editar chave), mude para "Não restringir a chave" ou adicione "Identity Toolkit API" na lista de APIs permitidas.',
+        message: 'A configuração que você fez na foto parece correta! Certifique-se de ter clicado em "Salvar" e aguarde 5 minutos para o Google aplicar as mudanças.',
         link: 'https://console.cloud.google.com/apis/credentials?project=104601029201'
       });
     } else {
@@ -101,21 +99,14 @@ export function AuthScreen() {
         </CardHeader>
         <CardContent className="space-y-4">
           {apiError && (
-            <Alert variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
-              {apiError.type === 'blocked' ? <ShieldAlert className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-              <AlertTitle className="font-bold">
-                {apiError.type === 'blocked' ? 'Restrição de Chave Detectada' : 'Configuração Necessária'}
-              </AlertTitle>
+            <Alert variant="default" className="bg-primary/5 text-primary border-primary/20">
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertTitle className="font-bold">Quase lá!</AlertTitle>
               <AlertDescription className="space-y-3">
                 <p className="text-xs leading-relaxed">{apiError.message}</p>
-                <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90" asChild>
-                  <a href={apiError.link} target="_blank" rel="noopener noreferrer">
-                    {apiError.type === 'blocked' ? 'Corrigir Restrição de Chave' : 'Ativar API no Google'} <ExternalLink className="ml-2 h-3 w-3" />
-                  </a>
-                </Button>
                 <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground italic">
                   <Loader2 className="h-2 w-2 animate-spin" />
-                  <span>Após salvar no Google, aguarde 5 minutos para o efeito.</span>
+                  <span>Aguardando propagação do Google (pode levar 5 min).</span>
                 </div>
               </AlertDescription>
             </Alert>
