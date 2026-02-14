@@ -1,0 +1,27 @@
+
+{
+  "entities": {
+    "UserFile": {
+      "title": "User File",
+      "description": "Metadata and content of a file stored by the user",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Original name of the file" },
+        "type": { "type": "string", "description": "MIME type of the file" },
+        "size": { "type": "number", "description": "Size in bytes" },
+        "dataUri": { "type": "string", "description": "The file content as a base64 data URI" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "type", "dataUri", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com", "password"]
+  },
+  "firestore": {
+    "/users/{userId}/files/{fileId}": {
+      "schema": "UserFile",
+      "description": "Collection of files belonging to a specific user"
+    }
+  }
+}
