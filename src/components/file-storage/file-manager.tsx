@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -77,7 +76,7 @@ export function FileManager({ user }: { user: User }) {
           <p className="text-muted-foreground">Gerencie seus documentos e mídias pessoais com segurança.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Input 
+          <input 
             type="file" 
             id="file-upload" 
             className="hidden" 
