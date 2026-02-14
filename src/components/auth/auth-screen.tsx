@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink } from 'lucide-react';
+import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, ShieldAlert } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -18,7 +18,7 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [apiError, setApiError] = useState<{ message: string; link: string } | null>(null);
+  const [apiError, setApiError] = useState<{ message: string; link: string; type: 'enable' | 'blocked' } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,10 +54,19 @@ export function AuthScreen() {
 
   const handleAuthError = (error: any) => {
     const errorMsg = error.message || '';
-    if (errorMsg.includes('identity-toolkit-api-has-not-been-used') || errorMsg.includes('identitytoolkit.googleapis.com')) {
+    const errorCode = error.code || '';
+    
+    if (errorMsg.includes('identity-toolkit-api-has-not-been-used') || errorCode.includes('api-not-enabled')) {
       setApiError({
-        message: 'A API de Autenticação precisa ser ativada no seu console do Google Cloud.',
+        type: 'enable',
+        message: 'A API de Autenticação ainda não foi ativada. Clique no botão abaixo para ativar agora.',
         link: 'https://console.developers.google.com/apis/api/identitytoolkit.googleapis.com/overview?project=104601029201'
+      });
+    } else if (errorMsg.includes('blocked') || errorCode.includes('requests-to-this-api-identitytoolkit-are-blocked')) {
+      setApiError({
+        type: 'blocked',
+        message: 'A API foi ativada, mas o acesso está sendo bloqueado por restrições de chave. No console do Google Cloud, vá em "APIs e Serviços > Credenciais", clique na sua chave de API e remova as restrições ou adicione "Identity Toolkit API" à lista de permitidas.',
+        link: 'https://console.cloud.google.com/apis/credentials?project=104601029201'
       });
     } else {
       toast({
@@ -90,15 +99,18 @@ export function AuthScreen() {
         <CardContent className="space-y-4">
           {apiError && (
             <Alert variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Configuração Necessária</AlertTitle>
+              {apiError.type === 'blocked' ? <ShieldAlert className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+              <AlertTitle>{apiError.type === 'blocked' ? 'Acesso Bloqueado' : 'Configuração Necessária'}</AlertTitle>
               <AlertDescription className="space-y-3">
                 <p className="text-xs leading-relaxed">{apiError.message}</p>
                 <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90" asChild>
                   <a href={apiError.link} target="_blank" rel="noopener noreferrer">
-                    Ativar no Google Console <ExternalLink className="ml-2 h-3 w-3" />
+                    {apiError.type === 'blocked' ? 'Verificar Chave de API' : 'Ativar no Google Console'} <ExternalLink className="ml-2 h-3 w-3" />
                   </a>
                 </Button>
+                <p className="text-[10px] text-muted-foreground italic text-center">
+                  Após ajustar, aguarde 2 minutos e tente novamente.
+                </p>
               </AlertDescription>
             </Alert>
           )}
