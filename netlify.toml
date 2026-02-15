@@ -6,6 +6,7 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Esta regra cria a "ponte" para o login do Google funcionar no seu domínio da Netlify
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
