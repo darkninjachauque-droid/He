@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, ShieldAlert, CheckCircle2, Settings } from 'lucide-react';
+import { Lock, Mail, Loader2, ShieldCheck, ExternalLink, Settings, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -57,31 +57,30 @@ export function AuthScreen() {
   };
 
   const handleAuthError = (error: any) => {
-    const errorMsg = error.message || '';
     const errorCode = error.code || '';
     
-    // Erro de API desativada
+    // Links específicos para o projeto do usuário
+    const projectId = "proto-vault-storage";
+    
     if (errorCode.includes('identity-toolkit-api-has-not-been-used') || errorCode.includes('api-not-enabled')) {
       setApiError({
         type: 'enable',
-        message: 'A API de Autenticação precisa ser ativada.',
-        link: 'https://console.developers.google.com/apis/api/identitytoolkit.googleapis.com/overview?project=104601029201'
+        message: 'A API de Autenticação precisa ser ativada no Google Cloud.',
+        link: `https://console.developers.google.com/apis/api/identitytoolkit.googleapis.com/overview?project=${projectId}`
       });
     } 
-    // Erro de Restrição de Chave (API Key Restriction)
     else if (errorCode.includes('requests-to-this-api-identitytoolkit-are-blocked')) {
       setApiError({
         type: 'blocked',
-        message: 'A sua Chave de API ainda está bloqueando o login. Verifique as restrições.',
-        link: 'https://console.cloud.google.com/apis/credentials?project=104601029201'
+        message: 'A sua Chave de API está bloqueando o login. Verifique as restrições.',
+        link: `https://console.cloud.google.com/apis/credentials?project=${projectId}`
       });
     }
-    // Erro de Provedor não configurado no Firebase (Configuration not found)
     else if (errorCode.includes('configuration-not-found') || errorCode.includes('project-not-found')) {
       setApiError({
         type: 'config',
         message: 'O login do Google precisa ser ativado no painel do Firebase.',
-        link: 'https://console.firebase.google.com/project/_/authentication/providers'
+        link: `https://console.firebase.google.com/project/${projectId}/authentication/providers`
       });
     }
     else {
@@ -119,6 +118,9 @@ export function AuthScreen() {
               <AlertTitle className="font-bold">Ação Necessária</AlertTitle>
               <AlertDescription className="space-y-3">
                 <p className="text-xs leading-relaxed">{apiError.message}</p>
+                <div className="bg-white/50 p-2 rounded text-[10px] text-muted-foreground mb-2">
+                  <strong>Atenção:</strong> Se o Google pedir "Verificação em duas etapas", você deve ativá-la primeiro para conseguir acessar o painel.
+                </div>
                 <Button 
                   variant="destructive" 
                   size="sm" 
@@ -126,11 +128,8 @@ export function AuthScreen() {
                   onClick={() => window.open(apiError.link, '_blank')}
                 >
                   <ExternalLink className="mr-1 h-3 w-3" />
-                  ATIVAR NO GOOGLE AGORA
+                  ABRIR PAINEL DE ATIVAÇÃO
                 </Button>
-                <p className="text-[9px] text-muted-foreground italic text-center">
-                  Após ativar, aguarde 5 minutos e tente novamente.
-                </p>
               </AlertDescription>
             </Alert>
           )}
