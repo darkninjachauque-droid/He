@@ -12,8 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, Key, Shield } from 'lucide-react';
+import { Mail, Loader2, Key, Shield, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function AuthScreen() {
   const auth = useAuth();
@@ -28,13 +29,19 @@ export function AuthScreen() {
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
+      // Forçamos a seleção de conta para evitar loops
+      provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
     } catch (error: any) {
-      if (error.code === 'auth/popup-closed-by-user') return;
+      if (error.code === 'auth/popup-closed-by-user') {
+        setLoading(false);
+        return;
+      }
+      
       toast({
         variant: "destructive",
-        title: "Erro de Acesso",
-        description: "Não foi possível conectar com o Google. Verifique sua conexão."
+        title: "Erro de Autenticação",
+        description: "Verifique se o domínio está autorizado no console do Firebase."
       });
     } finally {
       setLoading(false);
@@ -75,7 +82,7 @@ export function AuthScreen() {
       <Card className="w-full shadow-2xl border-white/5 bg-secondary/20 backdrop-blur-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-xl text-white">Acessar Cofre</CardTitle>
-          <CardDescription className="text-muted-foreground/80">Identifique-se para entrar.</CardDescription>
+          <CardDescription className="text-muted-foreground/80">Identifique-se para entrar no seu cofre.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button 
@@ -118,7 +125,7 @@ export function AuthScreen() {
               </div>
             </div>
             <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar' : 'Registrar'}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar no Cofre' : 'Registrar no Cofre'}
             </Button>
           </form>
         </CardContent>

@@ -2,7 +2,7 @@
 
 export const firebaseConfig = {
   apiKey: "AIzaSyBso-PWibFZmgxAAH26DQxUinlBjjD5p-g",
-  // Usando o domínio padrão que o Google já aceita automaticamente
+  // Usamos o domínio oficial que o Google já aceita (o da sua imagem)
   authDomain: "studio-9995869127-3ea67.firebaseapp.com",
   projectId: "studio-9995869127-3ea67",
   storageBucket: "studio-9995869127-3ea67.firebasestorage.app",
