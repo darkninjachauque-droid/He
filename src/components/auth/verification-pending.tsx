@@ -74,20 +74,20 @@ export function VerificationPending({ user }: VerificationPendingProps) {
     <div className="flex flex-col items-center justify-center py-12 px-4 max-w-md mx-auto text-center space-y-8">
       <div className="relative">
         <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-        <div className="relative bg-secondary/40 w-24 h-24 rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl">
+        <div className="relative bg-card w-24 h-24 rounded-3xl flex items-center justify-center border border-border shadow-2xl">
           <Mail className="h-12 w-12 text-primary animate-pulse" />
           <ShieldAlert className="absolute -top-2 -right-2 h-8 w-8 text-destructive fill-background" />
         </div>
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-3xl font-bold text-white tracking-tight">Acesso Bloqueado</h2>
+        <h2 className="text-3xl font-bold text-foreground tracking-tight">Acesso Bloqueado</h2>
         <p className="text-muted-foreground leading-relaxed">
           Para sua segurança, o cofre da <strong>{user.email}</strong> só será aberto após a confirmação do e-mail.
         </p>
       </div>
 
-      <Card className="w-full bg-secondary/20 border-white/5 backdrop-blur-md">
+      <Card className="w-full bg-card border-border shadow-lg">
         <CardContent className="pt-6 space-y-4">
           <Button 
             className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg shadow-lg shadow-primary/20"
@@ -100,7 +100,7 @@ export function VerificationPending({ user }: VerificationPendingProps) {
 
           <Button 
             variant="outline" 
-            className="w-full border-white/10 hover:bg-white/5"
+            className="w-full border-input hover:bg-accent"
             onClick={handleResend}
             disabled={resending}
           >
@@ -108,8 +108,8 @@ export function VerificationPending({ user }: VerificationPendingProps) {
             Reenviar link de confirmação
           </Button>
         </CardContent>
-        <CardFooter className="flex justify-center border-t border-white/5 bg-black/20 py-4">
-          <Button variant="ghost" className="text-muted-foreground hover:text-white" onClick={handleSignOut}>
+        <CardFooter className="flex justify-center border-t border-border bg-muted/30 py-4">
+          <Button variant="ghost" className="text-muted-foreground hover:text-foreground" onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />
             Sair e usar outra conta
           </Button>

@@ -105,7 +105,7 @@ export function AuthScreen() {
         <div className="bg-primary/20 w-20 h-20 rounded-full flex items-center justify-center border border-primary/30 shadow-2xl">
           <Mail className="h-10 w-10 text-primary animate-bounce" />
         </div>
-        <h2 className="text-2xl font-bold text-white">Verifique seu E-mail</h2>
+        <h2 className="text-2xl font-bold text-foreground">Verifique seu E-mail</h2>
         <p className="text-muted-foreground">
           Enviamos um código de segurança para <strong>{email}</strong>. 
           Acesse seu e-mail e clique no link para ativar seu cofre.
@@ -123,21 +123,21 @@ export function AuthScreen() {
         <div className="mx-auto bg-primary/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-primary/30 shadow-2xl shadow-primary/20">
           <Shield className="h-10 w-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">HelioTech</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">HelioTech</h1>
         <p className="text-primary text-[10px] uppercase tracking-widest font-bold">Cofre de Arquivos Seguro</p>
       </div>
 
-      <Card className="w-full shadow-2xl border-white/5 bg-secondary/20 backdrop-blur-xl">
+      <Card className="w-full shadow-2xl border-border bg-card">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl text-white">{isLogin ? 'Acessar Cofre' : 'Criar Nova Conta'}</CardTitle>
-          <CardDescription className="text-muted-foreground/80">
+          <CardTitle className="text-xl text-foreground">{isLogin ? 'Acessar Cofre' : 'Criar Nova Conta'}</CardTitle>
+          <CardDescription className="text-muted-foreground">
             {isLogin ? 'Identifique-se para entrar no seu cofre.' : 'Preencha os dados para criar seu cofre seguro.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button 
             variant="outline" 
-            className="w-full h-12 gap-3 border-white/10 bg-white/5 hover:bg-white/10 text-white shadow-lg" 
+            className="w-full h-12 gap-3 border-input bg-background hover:bg-accent text-foreground shadow-sm" 
             onClick={handleGoogleSignIn}
             disabled={loading}
           >
@@ -154,18 +154,18 @@ export function AuthScreen() {
             )}
           </Button>
 
-          <div className="relative flex items-center justify-center text-[10px] uppercase font-bold text-muted-foreground/60 py-2">
-            <span className="bg-transparent px-2 z-10">Ou use e-mail</span>
-            <div className="absolute w-full border-t border-white/5" />
+          <div className="relative flex items-center justify-center text-[10px] uppercase font-bold text-muted-foreground py-2">
+            <span className="bg-card px-2 z-10">Ou use e-mail</span>
+            <div className="absolute w-full border-t border-border" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-white/70">Seu Melhor E-mail</Label>
+              <Label className="text-foreground">Seu Melhor E-mail</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50" 
+                  className="pl-10 bg-background border-input text-foreground focus:border-primary" 
                   type="email" 
                   placeholder="exemplo@email.com"
                   value={email} 
@@ -175,11 +175,11 @@ export function AuthScreen() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-white/70">Senha Segura</Label>
+              <Label className="text-foreground">Senha Segura</Label>
               <div className="relative">
                 <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50" 
+                  className="pl-10 bg-background border-input text-foreground focus:border-primary" 
                   type="password" 
                   placeholder="Mínimo 6 caracteres"
                   value={password} 
@@ -191,11 +191,11 @@ export function AuthScreen() {
 
             {!isLogin && (
               <div className="space-y-2 animate-in slide-in-from-top-2">
-                <Label className="text-white/70">Confirme sua Senha</Label>
+                <Label className="text-foreground">Confirme sua Senha</Label>
                 <div className="relative">
                   <CheckCircle2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50" 
+                    className="pl-10 bg-background border-input text-foreground focus:border-primary" 
                     type="password" 
                     placeholder="Repita a senha"
                     value={confirmPassword} 
@@ -211,7 +211,7 @@ export function AuthScreen() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="bg-black/20 flex justify-center py-4 rounded-b-lg">
+        <CardFooter className="bg-muted/30 flex justify-center py-4 rounded-b-lg border-t border-border">
           <Button variant="link" size="sm" className="text-primary font-semibold" onClick={() => setIsLogin(!isLogin)}>
             {isLogin ? 'Não tem conta? Crie aqui' : 'Já tem conta? Faça login'}
           </Button>
