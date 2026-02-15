@@ -80,7 +80,7 @@ export function AuthScreen() {
     else if (errorCode.includes('configuration-not-found') || errorCode.includes('project-not-found')) {
       setApiError({
         type: 'config',
-        message: 'O login do Google não está ativo. Clique no botão abaixo para ativar no painel do Firebase.',
+        message: 'O login do Google não está ativo no Firebase. Clique no botão abaixo para ativar.',
         link: `https://console.firebase.google.com/project/${projectId}/authentication/providers`
       });
     }
@@ -129,7 +129,7 @@ export function AuthScreen() {
                   CORRIGIR NO PAINEL AGORA
                 </Button>
                 <p className="text-[10px] text-muted-foreground text-center italic">
-                  Abra o projeto APKFusion no console e siga as instruções.
+                  Certifique-se de estar logado na conta correta do Google.
                 </p>
               </AlertDescription>
             </Alert>
@@ -208,7 +208,7 @@ export function AuthScreen() {
 
       <div className="mt-6 flex items-center gap-2 text-muted-foreground text-xs bg-muted/50 p-2 rounded-lg border">
         <Info className="h-3 w-3" />
-        <span>Clique no projeto "APKFusion" na sua tela do Firebase.</span>
+        <span>No console do Firebase, ative o "Google" em Authentication.</span>
       </div>
     </div>
   );
