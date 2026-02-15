@@ -25,7 +25,7 @@ export default function HomePage() {
         {user ? <FileManager user={user} /> : <AuthScreen />}
       </main>
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} HelioTech - Salva Arquivos. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} HelioTech - Arquivo Seguro. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
