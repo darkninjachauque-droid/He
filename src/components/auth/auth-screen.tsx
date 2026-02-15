@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, Copy, CheckCircle2 } from 'lucide-react';
+import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, Copy, CheckCircle2, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -27,7 +27,7 @@ export function AuthScreen() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Copiado!", description: "Link copiado para a área de transferência." });
+    toast({ title: "Copiado!", description: "Link copiado." });
   };
 
   const handleAuthError = (error: any) => {
@@ -35,15 +35,15 @@ export function AuthScreen() {
 
     if (error.code === 'auth/redirect-uri-mismatch' || error.message?.includes('redirect_uri_mismatch')) {
       setErrorInfo({
-        title: "Ajuste Necessário no Google",
-        message: "O Google ainda não reconheceu seu link. Copie os dois links abaixo e cole nos campos correspondentes do seu Console do Google Cloud.",
+        title: "Ajuste no Google Cloud",
+        message: "O Google ainda não autorizou seu domínio profissional.",
         code: error.code
       });
     } else {
       toast({
         variant: "destructive",
         title: "Erro de Acesso",
-        description: error.message || "Verifique suas credenciais ou a conexão."
+        description: error.message || "Erro ao conectar."
       });
     }
   };
@@ -83,42 +83,25 @@ export function AuthScreen() {
   return (
     <div className="flex flex-col items-center justify-center py-10 px-4 max-w-md mx-auto">
       <div className="mb-8 text-center space-y-2">
-        <div className="mx-auto bg-primary/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-primary/30 shadow-2xl shadow-primary/20 animate-pulse">
-          <FileArchive className="h-10 w-10 text-primary" />
+        <div className="mx-auto bg-primary/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-primary/30 shadow-2xl shadow-primary/20">
+          <Shield className="h-10 w-10 text-primary" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-white">HelioTech</h1>
-        <p className="text-primary text-[10px] uppercase tracking-widest font-bold">Arquivo Seguro • Modo Cofre</p>
+        <p className="text-primary text-[10px] uppercase tracking-widest font-bold">Cofre de Arquivos Seguro</p>
       </div>
 
       {errorInfo && (
-        <Alert variant="destructive" className="mb-6 border-2 shadow-lg bg-destructive/10 text-white animate-in slide-in-from-top-4">
+        <Alert variant="destructive" className="mb-6 border-2 bg-destructive/10 text-white animate-in slide-in-from-top-4">
           <AlertCircle className="h-5 w-5 text-red-400" />
-          <AlertTitle className="font-bold">{errorInfo.title}</AlertTitle>
+          <AlertTitle className="font-bold">Ação Necessária no Google</AlertTitle>
           <AlertDescription className="space-y-4 pt-2">
-            <p className="text-sm">Abra seu Google Console e cole estes links nos campos certos:</p>
-            
-            <div className="space-y-3">
-              <div>
-                <p className="text-[10px] font-bold uppercase mb-1 text-primary">CAMPO 1: ORIGENS JAVASCRIPT</p>
-                <div className="flex gap-2">
-                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app</code>
-                  <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app')}><Copy className="h-3 w-3" /></Button>
-                </div>
-              </div>
-              
-              <div>
-                <p className="text-[10px] font-bold uppercase mb-1 text-primary">CAMPO 2: REDIRECIONAMENTO</p>
-                <div className="flex gap-2">
-                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
-                  <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app/__/auth/handler')}><Copy className="h-3 w-3" /></Button>
-                </div>
-              </div>
+            <p className="text-xs">Para remover o nome "studio-..." da tela do Google, cole este link no campo "URIs de redirecionamento":</p>
+            <div className="flex gap-2">
+              <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
+              <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app/__/auth/handler')}><Copy className="h-3 w-3" /></Button>
             </div>
-
-            <Button variant="outline" size="sm" className="w-full font-bold border-white/20 hover:bg-white/10" asChild>
-              <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">
-                ABRIR MEU CONSOLE DO GOOGLE <ExternalLink className="ml-2 h-4 w-4" />
-              </a>
+            <Button variant="outline" size="sm" className="w-full font-bold" asChild>
+              <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">ABRIR MEU CONSOLE DO GOOGLE</a>
             </Button>
           </AlertDescription>
         </Alert>
@@ -126,17 +109,13 @@ export function AuthScreen() {
 
       <Card className="w-full shadow-2xl border-white/5 bg-secondary/20 backdrop-blur-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl text-white">{isLogin ? 'Acessar seu Cofre' : 'Criar Conta Segura'}</CardTitle>
-          <CardDescription className="text-muted-foreground/80">
-            {isLogin 
-              ? 'Identifique-se para gerenciar seus arquivos ZIP.' 
-              : 'Comece a guardar seus arquivos hoje mesmo.'}
-          </CardDescription>
+          <CardTitle className="text-xl text-white">Acessar Cofre</CardTitle>
+          <CardDescription className="text-muted-foreground/80">Identifique-se para entrar.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button 
             variant="outline" 
-            className="w-full h-12 gap-3 border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all shadow-lg" 
+            className="w-full h-12 gap-3 border-white/10 bg-white/5 hover:bg-white/10 text-white shadow-lg" 
             onClick={handleGoogleSignIn}
             disabled={loading}
           >
@@ -154,7 +133,7 @@ export function AuthScreen() {
           </Button>
 
           <div className="relative flex items-center justify-center text-[10px] uppercase font-bold text-muted-foreground/60 py-2">
-            <span className="bg-transparent px-2 z-10">Ou use seu e-mail</span>
+            <span className="bg-transparent px-2 z-10">Ou use e-mail</span>
             <div className="absolute w-full border-t border-white/5" />
           </div>
 
@@ -163,32 +142,27 @@ export function AuthScreen() {
               <Label className="text-white/70">E-mail</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input className="pl-10 bg-white/5 border-white/10 text-white" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
             </div>
             <div className="space-y-2">
               <Label className="text-white/70">Senha</Label>
               <div className="relative">
                 <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input className="pl-10 bg-white/5 border-white/10 text-white" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
             </div>
-            <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Acessar Cofre' : 'Registrar Conta'}
+            <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold" disabled={loading}>
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar' : 'Registrar'}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="bg-black/20 flex justify-center py-4 border-t border-white/5 rounded-b-lg">
-          <Button variant="link" size="sm" className="text-primary hover:text-primary/80 font-semibold" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Ainda não tem conta? Clique aqui' : 'Já tem conta? Faça login'}
+        <CardFooter className="bg-black/20 flex justify-center py-4 rounded-b-lg">
+          <Button variant="link" size="sm" className="text-primary font-semibold" onClick={() => setIsLogin(!isLogin)}>
+            {isLogin ? 'Criar nova conta' : 'Já tenho conta'}
           </Button>
         </CardFooter>
       </Card>
-
-      <div className="mt-8 flex items-center gap-2 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
-        <CheckCircle2 className="h-3 w-3" />
-        Proteção HelioTech Ativada
-      </div>
     </div>
   );
 }
