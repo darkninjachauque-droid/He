@@ -39,7 +39,7 @@ export function AuthScreen() {
 
     if (error.code === 'auth/configuration-not-found') {
       errorInfo.message = `CONFLITO DE PROJETOS IDENTIFICADO!`;
-      errorInfo.debug = `O seu site está configurado para o ID "${firebaseConfig.projectId}". Mas você ativou o login no projeto "project-714918776457". Você precisa entrar no projeto "${firebaseConfig.projectId}" no seu console e ativar o login lá.`;
+      errorInfo.debug = `O seu site está configurado para o ID "${firebaseConfig.projectId}". Mas você ativou o login no seu console em um projeto diferente. Você precisa entrar no projeto "${firebaseConfig.projectId}" no seu console do Firebase e ativar o login lá.`;
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/operation-not-allowed') {
       errorInfo.message = "O login do Google não foi ativado no painel deste projeto.";
