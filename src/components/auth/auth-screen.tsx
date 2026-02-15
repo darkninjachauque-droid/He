@@ -6,13 +6,14 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signInWithPopup, 
-  GoogleAuthProvider 
+  GoogleAuthProvider,
+  sendEmailVerification
 } from 'firebase/auth';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, Key, Shield, AlertCircle } from 'lucide-react';
+import { Mail, Loader2, Key, Shield, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -23,13 +24,14 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [verificationSent, setVerificationSent] = useState(false);
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      // Forçamos a seleção de conta para evitar loops
       provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
     } catch (error: any) {
@@ -37,11 +39,10 @@ export function AuthScreen() {
         setLoading(false);
         return;
       }
-      
       toast({
         variant: "destructive",
         title: "Erro de Autenticação",
-        description: "Verifique se o domínio está autorizado no console do Firebase."
+        description: "Verifique as configurações do Google ou tente novamente."
       });
     } finally {
       setLoading(false);
@@ -51,23 +52,65 @@ export function AuthScreen() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth) return;
+
+    if (!isLogin && password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Senhas diferentes",
+        description: "As senhas digitadas não coincidem. Verifique a confirmação."
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Enviar verificação de e-mail
+        if (userCredential.user) {
+          await sendEmailVerification(userCredential.user);
+          setVerificationSent(true);
+          toast({
+            title: "Verificação Enviada!",
+            description: "Enviamos um link de confirmação para o seu e-mail."
+          });
+        }
       }
     } catch (error: any) {
+      console.error(error);
+      let message = "E-mail ou senha incorretos.";
+      if (error.code === 'auth/email-already-in-use') message = "Este e-mail já está em uso.";
+      if (error.code === 'auth/weak-password') message = "A senha deve ter pelo menos 6 caracteres.";
+      
       toast({
         variant: "destructive",
         title: "Erro de Acesso",
-        description: "E-mail ou senha incorretos."
+        description: message
       });
     } finally {
       setLoading(false);
     }
   };
+
+  if (verificationSent) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 px-4 max-w-md mx-auto text-center space-y-6">
+        <div className="bg-primary/20 w-20 h-20 rounded-full flex items-center justify-center border border-primary/30 shadow-2xl">
+          <Mail className="h-10 w-10 text-primary animate-bounce" />
+        </div>
+        <h2 className="text-2xl font-bold text-white">Verifique seu E-mail</h2>
+        <p className="text-muted-foreground">
+          Enviamos um código de segurança para <strong>{email}</strong>. 
+          Acesse seu e-mail e clique no link para ativar seu cofre.
+        </p>
+        <Button variant="outline" onClick={() => setVerificationSent(false)} className="w-full">
+          Voltar para o Login
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center py-10 px-4 max-w-md mx-auto">
@@ -81,8 +124,10 @@ export function AuthScreen() {
 
       <Card className="w-full shadow-2xl border-white/5 bg-secondary/20 backdrop-blur-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl text-white">Acessar Cofre</CardTitle>
-          <CardDescription className="text-muted-foreground/80">Identifique-se para entrar no seu cofre.</CardDescription>
+          <CardTitle className="text-xl text-white">{isLogin ? 'Acessar Cofre' : 'Criar Nova Conta'}</CardTitle>
+          <CardDescription className="text-muted-foreground/80">
+            {isLogin ? 'Identifique-se para entrar no seu cofre.' : 'Preencha os dados para criar seu cofre seguro.'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button 
@@ -111,30 +156,67 @@ export function AuthScreen() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-white/70">E-mail</Label>
+              <Label className="text-white/70">Seu Melhor E-mail</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10 bg-white/5 border-white/10 text-white" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input 
+                  className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50" 
+                  type="email" 
+                  placeholder="exemplo@email.com"
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                />
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-white/70">Senha</Label>
+              <Label className="text-white/70">Senha Segura</Label>
               <div className="relative">
                 <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10 bg-white/5 border-white/10 text-white" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input 
+                  className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50" 
+                  type="password" 
+                  placeholder="Mínimo 6 caracteres"
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                />
               </div>
             </div>
+
+            {!isLogin && (
+              <div className="space-y-2 animate-in slide-in-from-top-2">
+                <Label className="text-white/70">Confirme sua Senha</Label>
+                <div className="relative">
+                  <CheckCircle2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input 
+                    className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary/50" 
+                    type="password" 
+                    placeholder="Repita a senha"
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    required 
+                  />
+                </div>
+              </div>
+            )}
+
             <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar no Cofre' : 'Registrar no Cofre'}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar no Cofre' : 'Criar Conta e Enviar Código'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="bg-black/20 flex justify-center py-4 rounded-b-lg">
           <Button variant="link" size="sm" className="text-primary font-semibold" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Criar nova conta' : 'Já tenho conta'}
+            {isLogin ? 'Não tem conta? Crie aqui' : 'Já tem conta? Faça login'}
           </Button>
         </CardFooter>
       </Card>
+
+      <div className="mt-6 flex items-center gap-2 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+        <Shield className="h-3 w-3" />
+        Proteção de Dados HelioTech
+      </div>
     </div>
   );
 }
