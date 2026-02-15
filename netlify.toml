@@ -5,16 +5,9 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# PONTE DE SEGURANÇA OBRIGATÓRIA: Redireciona a autenticação para o Firebase
+# PONTE DE SEGURANÇA HELIOTECH: Redireciona a autenticação para o Firebase de forma invisível
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
   status = 200
   force = true
-
-# Garante que as rotas do Next.js funcionem sem erro 404
-[[redirects]]
-  from = "/*"
-  to = "/.next/server/pages/:splat"
-  status = 200
-  force = false
