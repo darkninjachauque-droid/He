@@ -44,11 +44,11 @@ export function AuthScreen() {
 
     if (error.code === 'auth/unauthorized-domain') {
       errorInfo.message = "DOMÍNIO NÃO AUTORIZADO!";
-      errorInfo.instruction = `Você precisa adicionar "${currentDomain}" à lista de Domínios Autorizados no Firebase.`;
+      errorInfo.instruction = `Copie isto: "${currentDomain}" e adicione na lista de Domínios Autorizados no Firebase.`;
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
     } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
       errorInfo.message = "MÉTODO DE LOGIN DESATIVADO!";
-      errorInfo.instruction = "Ative o login por E-mail e Google no painel.";
+      errorInfo.instruction = "Ative o login por 'E-mail e senha' e 'Google' no painel Authentication > Sign-in method.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/invalid-credential') {
       errorInfo.message = "E-mail ou senha incorretos.";
@@ -115,7 +115,7 @@ export function AuthScreen() {
           <AlertDescription className="space-y-3">
             <p className="text-sm font-semibold">{detailedError.message}</p>
             {detailedError.instruction && (
-              <p className="text-xs bg-destructive/10 p-2 rounded border border-destructive/20 font-mono break-all">
+              <p className="text-xs bg-destructive/10 p-2 rounded border border-destructive/20 font-mono break-all font-bold">
                 {detailedError.instruction}
               </p>
             )}
