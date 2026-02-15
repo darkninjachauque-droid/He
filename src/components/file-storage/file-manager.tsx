@@ -57,7 +57,7 @@ export function FileManager({ user }: { user: User }) {
           dataUri: dataUri,
           createdAt: serverTimestamp(),
         });
-        toast({ title: "Protegido!", description: `O arquivo ${file.name} foi guardado no seu cofre.` });
+        toast({ title: "Arquivo Salvo!", description: `O arquivo ${file.name} foi guardado permanentemente no seu cofre.` });
       } catch (error) {
         toast({ variant: "destructive", title: "Erro ao guardar", description: "Não foi possível salvar o arquivo." });
       } finally {
@@ -83,11 +83,11 @@ export function FileManager({ user }: { user: User }) {
     <div className="space-y-8 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-primary" />
-            Meu Cofre de ZIPs
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-primary">
+            <ShieldCheck className="h-8 w-8" />
+            Meu Cofre Pessoal
           </h1>
-          <p className="text-muted-foreground mt-1">Armazene seus arquivos ZIP com segurança total.</p>
+          <p className="text-muted-foreground mt-1">Seus arquivos ZIP guardados para sempre.</p>
         </div>
         <div className="flex items-center gap-2">
           <input 
@@ -98,10 +98,10 @@ export function FileManager({ user }: { user: User }) {
             onChange={handleFileUpload} 
             disabled={isUploading}
           />
-          <Button asChild disabled={isUploading} size="lg" className="shadow-lg shadow-primary/20">
+          <Button asChild disabled={isUploading} size="lg" className="shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90">
             <label htmlFor="file-upload" className="cursor-pointer">
               {isUploading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Upload className="mr-2 h-5 w-5" />}
-              {isUploading ? "Criptografando..." : "Novo Arquivo ZIP"}
+              {isUploading ? "Guardando..." : "Novo Arquivo ZIP"}
             </label>
           </Button>
         </div>
@@ -110,7 +110,7 @@ export function FileManager({ user }: { user: User }) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
-          placeholder="Pesquisar no cofre..." 
+          placeholder="Pesquisar nos meus arquivos..." 
           className="pl-10 h-12 bg-card border-2 focus-visible:ring-primary" 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -130,7 +130,7 @@ export function FileManager({ user }: { user: User }) {
                   <FileArchive className="h-7 w-7 text-primary" />
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-primary/10" asChild title="Baixar">
+                  <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-primary/10 text-primary" asChild title="Baixar">
                     <a href={file.dataUri} download={file.name}>
                       <Download className="h-5 w-5" />
                     </a>
@@ -150,7 +150,7 @@ export function FileManager({ user }: { user: User }) {
                   </span>
                   <div className="flex items-center gap-1 text-[10px] text-primary font-bold">
                     <ShieldCheck className="h-3 w-3" />
-                    PROTEGIDO
+                    GUARDADO
                   </div>
                 </div>
               </CardContent>
@@ -160,7 +160,7 @@ export function FileManager({ user }: { user: User }) {
           <div className="col-span-full py-24 text-center border-2 border-dashed rounded-2xl bg-muted/20">
             <FileArchive className="h-16 w-16 mx-auto text-muted-foreground opacity-20 mb-4" />
             <h3 className="text-lg font-semibold text-muted-foreground">O seu cofre está vazio</h3>
-            <p className="text-sm text-muted-foreground/60 mb-6">Comece a proteger seus arquivos ZIP clicando no botão acima.</p>
+            <p className="text-sm text-muted-foreground/60 mb-6">Guarde seus arquivos ZIP aqui. Eles nunca sumirão.</p>
             <Button variant="outline" onClick={() => document.getElementById('file-upload')?.click()}>
               Subir primeiro ZIP
             </Button>
