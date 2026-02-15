@@ -13,9 +13,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink } from 'lucide-react';
+import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { firebaseConfig } from '@/firebase/config';
 
 export function AuthScreen() {
   const auth = useAuth();
@@ -24,7 +25,7 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string } | null>(null);
+  const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string; debug?: string } | null>(null);
 
   const handleAuthError = (error: any) => {
     console.error("Auth Error:", error.code, error.message);
@@ -32,19 +33,22 @@ export function AuthScreen() {
     let errorInfo = {
       code: error.code || 'unknown',
       message: "Ocorreu um problema ao tentar acessar.",
-      link: ""
+      link: "",
+      debug: ""
     };
 
-    if (error.code === 'auth/operation-not-allowed') {
+    if (error.code === 'auth/configuration-not-found') {
+      errorInfo.message = `O login do Google não foi encontrado para o projeto "${firebaseConfig.projectId}". Certifique-se de que ativou o provedor Google EXATAMENTE neste projeto no console do Firebase.`;
+      errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
+      errorInfo.debug = `Projeto atual no código: ${firebaseConfig.projectId}`;
+    } else if (error.code === 'auth/operation-not-allowed') {
       errorInfo.message = "O provedor Google ainda não foi ativado no painel do Firebase.";
-      errorInfo.link = "https://console.firebase.google.com/project/_/authentication/providers";
+      errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
+    } else if (error.code === 'auth/unauthorized-domain') {
+      errorInfo.message = "Este domínio não está autorizado no Firebase. Adicione o domínio atual em 'Authorized Domains'.";
+      errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
     } else if (error.code === 'auth/popup-blocked') {
       errorInfo.message = "O seu navegador bloqueou a janela de login. Por favor, libere os pop-ups.";
-    } else if (error.code === 'auth/cancelled-popup-request') {
-      errorInfo.message = "O login foi cancelado ou a janela foi fechada antes de terminar.";
-    } else if (error.code === 'auth/unauthorized-domain') {
-      errorInfo.message = "Este domínio não está autorizado no Firebase. Adicione o domínio atual em 'Authorized Domains' no console.";
-      errorInfo.link = "https://console.firebase.google.com/project/_/authentication/settings";
     } else {
       errorInfo.message = error.message || "Erro desconhecido ao tentar entrar.";
     }
@@ -104,15 +108,22 @@ export function AuthScreen() {
       </div>
 
       {detailedError && (
-        <Alert variant="destructive" className="mb-6 animate-in slide-in-from-top-2">
+        <Alert variant="destructive" className="mb-6 animate-in slide-in-from-top-2 border-2">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Erro: {detailedError.code}</AlertTitle>
-          <AlertDescription className="space-y-3">
-            <p>{detailedError.message}</p>
+          <AlertTitle className="font-bold">Ação Necessária</AlertTitle>
+          <AlertDescription className="space-y-4">
+            <p className="text-sm">{detailedError.message}</p>
+            
+            {detailedError.debug && (
+              <div className="bg-destructive/5 p-2 rounded text-[10px] font-mono border border-destructive/10">
+                DEBUG: {detailedError.debug}
+              </div>
+            )}
+
             {detailedError.link && (
-              <Button variant="outline" size="sm" className="w-full bg-destructive/10 border-destructive/20 text-destructive hover:bg-destructive/20" asChild>
+              <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90" asChild>
                 <a href={detailedError.link} target="_blank" rel="noopener noreferrer">
-                  Corrigir no Painel <ExternalLink className="ml-2 h-3 w-3" />
+                  Corrigir Agora no Painel <ExternalLink className="ml-2 h-3 w-3" />
                 </a>
               </Button>
             )}
@@ -195,6 +206,13 @@ export function AuthScreen() {
           </Button>
         </CardFooter>
       </Card>
+
+      <div className="mt-8 p-4 bg-muted/30 rounded-lg border border-dashed flex items-center gap-3">
+        <Settings className="h-4 w-4 text-muted-foreground" />
+        <p className="text-[10px] text-muted-foreground">
+          ID do Projeto: <span className="font-mono font-bold">{firebaseConfig.projectId}</span>
+        </p>
+      </div>
     </div>
   );
 }
