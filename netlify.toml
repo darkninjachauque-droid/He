@@ -3,6 +3,9 @@
   command = "npm run build"
   publish = ".next"
 
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
