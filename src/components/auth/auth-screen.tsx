@@ -58,8 +58,6 @@ export function AuthScreen() {
 
   const handleAuthError = (error: any) => {
     const errorCode = error.code || '';
-    
-    // Links específicos para o projeto do usuário
     const projectId = "proto-vault-storage";
     
     if (errorCode.includes('identity-toolkit-api-has-not-been-used') || errorCode.includes('api-not-enabled')) {
@@ -100,7 +98,7 @@ export function AuthScreen() {
         </div>
         <h1 className="text-3xl font-bold tracking-tight">MeuVault</h1>
         <p className="text-muted-foreground max-w-xs mx-auto">
-          Cofre pessoal para seus arquivos com segurança máxima.
+          Seu cofre pessoal e privado para arquivos.
         </p>
       </div>
 
@@ -119,7 +117,7 @@ export function AuthScreen() {
               <AlertDescription className="space-y-3">
                 <p className="text-xs leading-relaxed">{apiError.message}</p>
                 <div className="bg-white/50 p-2 rounded text-[10px] text-muted-foreground mb-2">
-                  <strong>Atenção:</strong> Se o Google pedir "Verificação em duas etapas", você deve ativá-la primeiro para conseguir acessar o painel.
+                  <strong>Atenção:</strong> Como você já ativou a Verificação em Duas Etapas, agora você pode clicar no botão abaixo e ativar o provedor Google.
                 </div>
                 <Button 
                   variant="destructive" 
@@ -128,7 +126,7 @@ export function AuthScreen() {
                   onClick={() => window.open(apiError.link, '_blank')}
                 >
                   <ExternalLink className="mr-1 h-3 w-3" />
-                  ABRIR PAINEL DE ATIVAÇÃO
+                  ATIVAR CONFIGURAÇÃO AGORA
                 </Button>
               </AlertDescription>
             </Alert>
@@ -205,7 +203,7 @@ export function AuthScreen() {
       
       <div className="mt-8 flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
         <CheckCircle2 className="h-3 w-3 text-green-500" />
-        <span>Criptografia de Ponta a Ponta Ativa</span>
+        <span>Criptografia Ativa</span>
       </div>
     </div>
   );
