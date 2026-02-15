@@ -47,8 +47,6 @@ export function AuthScreen() {
       errorInfo.message = "MÉTODO DE LOGIN DESATIVADO!";
       errorInfo.instruction = "Ative o login por 'E-mail e senha' no painel do Firebase.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
-    } else if (error.code === 'auth/invalid-credential') {
-      errorInfo.message = "E-mail ou senha incorretos.";
     }
 
     setDetailedError(errorInfo);
@@ -94,7 +92,7 @@ export function AuthScreen() {
   return (
     <div className="flex flex-col items-center justify-center py-10 px-4 max-w-md mx-auto">
       <div className="mb-8 text-center space-y-2">
-        <div className="mx-auto bg-primary/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-primary/30 shadow-2xl shadow-primary/20">
+        <div className="mx-auto bg-primary/20 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-primary/30 shadow-2xl shadow-primary/20 animate-pulse">
           <FileArchive className="h-10 w-10 text-primary" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-white">HelioTech</h1>
@@ -102,7 +100,7 @@ export function AuthScreen() {
       </div>
 
       {detailedError && (
-        <Alert variant="destructive" className="mb-6 border-2 shadow-lg bg-destructive/10 text-white">
+        <Alert variant="destructive" className="mb-6 border-2 shadow-lg bg-destructive/10 text-white animate-in slide-in-from-top-4">
           <AlertCircle className="h-5 w-5" />
           <AlertTitle className="font-bold">Ação Necessária</AlertTitle>
           <AlertDescription className="space-y-3">
@@ -123,19 +121,19 @@ export function AuthScreen() {
         </Alert>
       )}
 
-      <Card className="w-full shadow-2xl border-white/5 bg-secondary/20 backdrop-blur-sm">
+      <Card className="w-full shadow-2xl border-white/5 bg-secondary/20 backdrop-blur-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl text-white">{isLogin ? 'Entrar no Cofre' : 'Criar Conta Segura'}</CardTitle>
+          <CardTitle className="text-xl text-white">{isLogin ? 'Acessar seu Cofre' : 'Criar Conta Segura'}</CardTitle>
           <CardDescription className="text-muted-foreground/80">
             {isLogin 
-              ? 'Acesse seus arquivos ZIP protegidos por HelioTech.' 
-              : 'Comece a guardar seus arquivos hoje.'}
+              ? 'Identifique-se para gerenciar seus arquivos ZIP.' 
+              : 'Comece a guardar seus arquivos hoje mesmo.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button 
             variant="outline" 
-            className="w-full h-12 gap-2 border-white/10 bg-white/5 hover:bg-white/10 text-white" 
+            className="w-full h-12 gap-2 border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all" 
             onClick={handleGoogleSignIn}
             disabled={loading}
           >
@@ -149,7 +147,7 @@ export function AuthScreen() {
           </Button>
 
           <div className="relative flex items-center justify-center text-xs uppercase text-muted-foreground py-2">
-            <span className="bg-background px-2 z-10">Ou e-mail</span>
+            <span className="bg-background/50 backdrop-blur-sm px-2 z-10">Ou e-mail</span>
             <div className="absolute w-full border-t border-white/5" />
           </div>
 
@@ -158,24 +156,24 @@ export function AuthScreen() {
               <Label className="text-white/70">E-mail</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10 bg-white/5 border-white/10 text-white" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
             </div>
             <div className="space-y-2">
               <Label className="text-white/70">Senha</Label>
               <div className="relative">
                 <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10 bg-white/5 border-white/10 text-white" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input className="pl-10 bg-white/5 border-white/10 text-white focus:border-primary" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
             </div>
-            <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold" disabled={loading}>
+            <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Acessar Cofre' : 'Registrar Conta'}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="bg-black/20 flex justify-center py-4 border-t border-white/5">
-          <Button variant="link" size="sm" className="text-primary hover:text-primary/80" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Não tem conta? Crie uma aqui' : 'Já tem conta? Faça login'}
+        <CardFooter className="bg-black/20 flex justify-center py-4 border-t border-white/5 rounded-b-lg">
+          <Button variant="link" size="sm" className="text-primary hover:text-primary/80 font-semibold" onClick={() => setIsLogin(!isLogin)}>
+            {isLogin ? 'Ainda não tem conta? Clique aqui' : 'Já tem conta? Faça login'}
           </Button>
         </CardFooter>
       </Card>
@@ -183,9 +181,9 @@ export function AuthScreen() {
       <div className="mt-8 flex flex-col items-center gap-2 text-[10px] text-muted-foreground/50 font-mono">
         <div className="flex items-center gap-1">
           <ShieldCheck className="h-3 w-3" />
-          <span>PROJETO: HelioTech ID 9995869127</span>
+          <span>SISTEMA HELIOTECH V1.0</span>
         </div>
-        <p>Acesso via: heliotech-arquivo-seguro.netlify.app</p>
+        <p>Acesso Protegido via Netlify SSL</p>
       </div>
     </div>
   );

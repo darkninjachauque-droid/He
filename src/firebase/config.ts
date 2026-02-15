@@ -3,7 +3,7 @@
 
 export const firebaseConfig = {
   apiKey: "AIzaSyBso-PWibFZmgxAAH26DQxUinlBjjD5p-g",
-  authDomain: "heliotech-arquivo-seguro.netlify.app",
+  authDomain: "studio-9995869127-3ea67.firebaseapp.com",
   projectId: "studio-9995869127-3ea67",
   storageBucket: "studio-9995869127-3ea67.firebasestorage.app",
   messagingSenderId: "714918776457",
