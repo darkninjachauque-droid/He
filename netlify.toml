@@ -5,10 +5,16 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Esta regra cria a PONTE DE SEGURANÇA entre seu site e o Google
-# Ela redireciona as chamadas de autenticação do seu domínio Netlify para o Firebase
+# PONTE DE SEGURANÇA: Redireciona a autenticação para o Firebase através do seu domínio Netlify
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
   status = 200
   force = true
+
+# Garante que as rotas do Next.js funcionem sem erro 404
+[[redirects]]
+  from = "/*"
+  to = "/.next/server/pages/:splat"
+  status = 200
+  force = false

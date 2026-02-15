@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, ShieldCheck, Copy } from 'lucide-react';
+import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, Copy, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -23,28 +23,28 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorInfo, setErrorInfo] = useState<{ title: string, message: string, code: string, link: string } | null>(null);
+  const [errorInfo, setErrorInfo] = useState<{ title: string, message: string, code: string } | null>(null);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast({ title: "Copiado!", description: "Endereço copiado para a área de transferência." });
+    toast({ title: "Copiado!", description: "Link copiado para a área de transferência." });
   };
 
   const handleAuthError = (error: any) => {
+    console.error("Auth Error:", error.code, error.message);
     if (error.code === 'auth/popup-closed-by-user') return;
 
     if (error.code === 'auth/redirect-uri-mismatch' || error.message.includes('redirect_uri_mismatch')) {
       setErrorInfo({
         title: "Erro de Configuração no Google",
-        message: "O endereço configurado no console do Google está incorreto. Copie os links abaixo e cole no seu console do Google Cloud.",
-        code: error.code,
-        link: "https://console.cloud.google.com/apis/credentials"
+        message: "O Google bloqueou o acesso porque os links no console dele estão com erros de digitação. Copie os links abaixo e cole no seu Console do Google Cloud.",
+        code: error.code
       });
     } else {
       toast({
         variant: "destructive",
         title: "Erro de Acesso",
-        description: error.message
+        description: "Verifique suas credenciais ou a conexão."
       });
     }
   };
@@ -100,24 +100,24 @@ export function AuthScreen() {
             
             <div className="space-y-3">
               <div>
-                <p className="text-[10px] font-bold uppercase mb-1">Origem JavaScript:</p>
+                <p className="text-[10px] font-bold uppercase mb-1 text-primary">1. ORIGEM JAVASCRIPT:</p>
                 <div className="flex gap-2">
-                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app</code>
-                  <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app')}><Copy className="h-3 w-3" /></Button>
+                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all select-all">https://heliotech-arquivo-seguro.netlify.app</code>
+                  <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app')}><Copy className="h-3 w-3" /></Button>
                 </div>
               </div>
               
               <div>
-                <p className="text-[10px] font-bold uppercase mb-1">URI de Redirecionamento:</p>
+                <p className="text-[10px] font-bold uppercase mb-1 text-primary">2. URI DE REDIRECIONAMENTO:</p>
                 <div className="flex gap-2">
-                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
-                  <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app/__/auth/handler')}><Copy className="h-3 w-3" /></Button>
+                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all select-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
+                  <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app/__/auth/handler')}><Copy className="h-3 w-3" /></Button>
                 </div>
               </div>
             </div>
 
-            <Button variant="destructive" size="sm" className="w-full font-bold" asChild>
-              <a href={errorInfo.link} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm" className="w-full font-bold border-white/20 hover:bg-white/10" asChild>
+              <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">
                 ABRIR CONSOLE DO GOOGLE <ExternalLink className="ml-2 h-4 w-4" />
               </a>
             </Button>
@@ -137,7 +137,7 @@ export function AuthScreen() {
         <CardContent className="space-y-4">
           <Button 
             variant="outline" 
-            className="w-full h-12 gap-2 border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all" 
+            className="w-full h-12 gap-3 border-white/10 bg-white/5 hover:bg-white/10 text-white transition-all shadow-lg" 
             onClick={handleGoogleSignIn}
             disabled={loading}
           >
@@ -150,8 +150,8 @@ export function AuthScreen() {
             Entrar com Google
           </Button>
 
-          <div className="relative flex items-center justify-center text-xs uppercase text-muted-foreground py-2">
-            <span className="bg-background/50 backdrop-blur-sm px-2 z-10">Ou e-mail</span>
+          <div className="relative flex items-center justify-center text-[10px] uppercase font-bold text-muted-foreground/60 py-2">
+            <span className="bg-transparent px-2 z-10">Ou use seu e-mail</span>
             <div className="absolute w-full border-t border-white/5" />
           </div>
 
@@ -181,6 +181,11 @@ export function AuthScreen() {
           </Button>
         </CardFooter>
       </Card>
+
+      <div className="mt-8 flex items-center gap-2 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+        <CheckCircle2 className="h-3 w-3" />
+        Proteção HelioTech Ativada
+      </div>
     </div>
   );
 }
