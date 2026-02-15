@@ -4,10 +4,3 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# PONTE DE SEGURANÇA HELIOTECH: Essencial para o Google aceitar o seu nome profissional
-[[redirects]]
-  from = "/__/auth/*"
-  to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
-  status = 200
-  force = true

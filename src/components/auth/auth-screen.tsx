@@ -12,9 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, Copy, CheckCircle2, Shield } from 'lucide-react';
+import { Mail, Loader2, Key, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function AuthScreen() {
   const auth = useAuth();
@@ -23,40 +22,20 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorInfo, setErrorInfo] = useState<{ title: string, message: string, code: string } | null>(null);
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({ title: "Copiado!", description: "Link copiado." });
-  };
-
-  const handleAuthError = (error: any) => {
-    if (error.code === 'auth/popup-closed-by-user') return;
-
-    if (error.code === 'auth/redirect-uri-mismatch' || error.message?.includes('redirect_uri_mismatch')) {
-      setErrorInfo({
-        title: "Ajuste no Google Cloud",
-        message: "O Google ainda não autorizou seu domínio profissional.",
-        code: error.code
-      });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Erro de Acesso",
-        description: error.message || "Erro ao conectar."
-      });
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
     setLoading(true);
-    setErrorInfo(null);
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
     } catch (error: any) {
-      handleAuthError(error);
+      if (error.code === 'auth/popup-closed-by-user') return;
+      toast({
+        variant: "destructive",
+        title: "Erro de Acesso",
+        description: "Não foi possível conectar com o Google. Verifique sua conexão."
+      });
     } finally {
       setLoading(false);
     }
@@ -66,7 +45,6 @@ export function AuthScreen() {
     e.preventDefault();
     if (!auth) return;
     setLoading(true);
-    setErrorInfo(null);
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -74,7 +52,11 @@ export function AuthScreen() {
         await createUserWithEmailAndPassword(auth, email, password);
       }
     } catch (error: any) {
-      handleAuthError(error);
+      toast({
+        variant: "destructive",
+        title: "Erro de Acesso",
+        description: "E-mail ou senha incorretos."
+      });
     } finally {
       setLoading(false);
     }
@@ -89,23 +71,6 @@ export function AuthScreen() {
         <h1 className="text-3xl font-bold tracking-tight text-white">HelioTech</h1>
         <p className="text-primary text-[10px] uppercase tracking-widest font-bold">Cofre de Arquivos Seguro</p>
       </div>
-
-      {errorInfo && (
-        <Alert variant="destructive" className="mb-6 border-2 bg-destructive/10 text-white animate-in slide-in-from-top-4">
-          <AlertCircle className="h-5 w-5 text-red-400" />
-          <AlertTitle className="font-bold">Ação Necessária no Google</AlertTitle>
-          <AlertDescription className="space-y-4 pt-2">
-            <p className="text-xs">Para remover o nome "studio-..." da tela do Google, cole este link no campo "URIs de redirecionamento":</p>
-            <div className="flex gap-2">
-              <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
-              <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app/__/auth/handler')}><Copy className="h-3 w-3" /></Button>
-            </div>
-            <Button variant="outline" size="sm" className="w-full font-bold" asChild>
-              <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">ABRIR MEU CONSOLE DO GOOGLE</a>
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
 
       <Card className="w-full shadow-2xl border-white/5 bg-secondary/20 backdrop-blur-xl">
         <CardHeader className="text-center">
