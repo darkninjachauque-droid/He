@@ -6,6 +6,10 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'HelioTech - Arquivo Seguro',
   description: 'Seu cofre pessoal seguro para armazenamento de arquivos ZIP importantes.',
+  icons: {
+    icon: 'https://i.ibb.co/6R8m4rT/logo.png',
+    apple: 'https://i.ibb.co/6R8m4rT/logo.png',
+  },
 };
 
 export default function RootLayout({

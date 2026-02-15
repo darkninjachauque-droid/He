@@ -49,7 +49,6 @@ export function FileManager({ user }: { user: User }) {
     const file = e.target.files?.[0];
     if (!file || !filesRef) return;
 
-    // Filtro de segurança: Apenas ZIP
     if (!file.name.toLowerCase().endsWith('.zip') && file.type !== 'application/zip' && file.type !== 'application/x-zip-compressed') {
       toast({
         variant: "destructive",
@@ -59,7 +58,6 @@ export function FileManager({ user }: { user: User }) {
       return;
     }
 
-    // Limite técnico do Firestore (1MB)
     if (file.size > 1024 * 1024) { 
       toast({
         variant: "destructive",
@@ -74,7 +72,7 @@ export function FileManager({ user }: { user: User }) {
     
     reader.onerror = () => {
       setIsUploading(false);
-      toast({ variant: "destructive", title: "Erro de leitura", description: "Não foi possível ler o arquivo do seu dispositivo." });
+      toast({ variant: "destructive", title: "Erro de leitura", description: "Não foi possível ler o arquivo." });
     };
 
     reader.onload = (event) => {
@@ -87,7 +85,7 @@ export function FileManager({ user }: { user: User }) {
         createdAt: serverTimestamp(),
       };
       
-      // Operação não-bloqueante (UI Otimista)
+      // Salva no banco de dados
       addDoc(filesRef, fileData)
         .catch(async (serverError) => {
           const permissionError = new FirestorePermissionError({
@@ -98,11 +96,11 @@ export function FileManager({ user }: { user: User }) {
           errorEmitter.emit('permission-error', permissionError);
         });
       
-      // Libera a UI imediatamente
+      // Libera a interface IMEDIATAMENTE (Otimista)
       setIsUploading(false);
       toast({ 
-        title: "Proteção Ativada!", 
-        description: `O arquivo ${file.name} agora está guardado para sempre no seu cofre.` 
+        title: "Arquivo Guardado!", 
+        description: `O arquivo ${file.name} foi protegido com sucesso.` 
       });
       e.target.value = '';
     };
@@ -132,9 +130,9 @@ export function FileManager({ user }: { user: User }) {
       {!user.emailVerified && !user.providerData.some(p => p.providerId === 'google.com') && (
         <Alert variant="destructive" className="bg-destructive/10 border-destructive/50 text-destructive">
           <MailWarning className="h-4 w-4" />
-          <AlertTitle className="font-bold">Verifique seu E-mail</AlertTitle>
+          <AlertTitle className="font-bold">E-mail não confirmado</AlertTitle>
           <AlertDescription>
-            Sua conta ainda não está verificada. Verifique sua caixa de entrada para garantir a permanência dos seus arquivos.
+            Sua conta ainda não está verificada. Verifique seu Gmail para garantir a segurança dos seus dados.
           </AlertDescription>
         </Alert>
       )}
@@ -143,11 +141,11 @@ export function FileManager({ user }: { user: User }) {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-primary">
             <ShieldCheck className="h-8 w-8" />
-            Meu Cofre Seguro
+            Meu Cofre HelioTech
           </h1>
           <p className="text-muted-foreground flex items-center gap-2">
             <Lock className="h-3 w-3" />
-            Arquivos ZIP protegidos pela criptografia HelioTech.
+            Arquivos ZIP salvos para sempre no seu cofre pessoal.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -162,7 +160,7 @@ export function FileManager({ user }: { user: User }) {
           <Button asChild disabled={isUploading} size="lg" className="shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
             <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2">
               {isUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
-              {isUploading ? "Guardando..." : "Salvar Novo ZIP"}
+              {isUploading ? "Processando..." : "Salvar Novo ZIP"}
             </label>
           </Button>
         </div>
@@ -171,8 +169,8 @@ export function FileManager({ user }: { user: User }) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
-          placeholder="Pesquisar nos meus arquivos guardados..." 
-          className="pl-10 h-12 bg-card border-2 border-primary/10 focus-visible:ring-primary text-foreground" 
+          placeholder="Pesquisar nos meus arquivos..." 
+          className="pl-10 h-12 bg-card border-2 border-primary/10 focus-visible:ring-primary" 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -203,23 +201,23 @@ export function FileManager({ user }: { user: User }) {
                         <Trash2 className="h-5 w-5" />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-background border-2 border-destructive/20">
+                    <AlertDialogContent className="bg-card border-2 border-destructive/20">
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2 text-foreground">
+                        <AlertDialogTitle className="flex items-center gap-2">
                           <AlertTriangle className="h-5 w-5 text-destructive" />
-                          Segurança do Cofre
+                          Confirmação de Segurança
                         </AlertDialogTitle>
-                        <AlertDialogDescription className="text-muted-foreground">
-                          O arquivo <strong className="text-foreground">{file.name}</strong> está protegido. Tem certeza que deseja removê-lo permanentemente?
+                        <AlertDialogDescription>
+                          Deseja remover <strong>{file.name}</strong> do seu cofre permanentemente?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="hover:bg-accent text-foreground">Manter no Cofre</AlertDialogCancel>
+                        <AlertDialogCancel>Manter</AlertDialogCancel>
                         <AlertDialogAction 
                           onClick={() => handleDelete(file.id)}
-                          className="bg-destructive hover:bg-destructive/90 text-white font-bold"
+                          className="bg-destructive hover:bg-destructive/90 text-white"
                         >
-                          Apagar Agora
+                          Remover Agora
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -227,7 +225,7 @@ export function FileManager({ user }: { user: User }) {
                 </div>
               </CardHeader>
               <CardContent className="p-5">
-                <CardTitle className="text-sm font-bold truncate mb-1 text-foreground" title={file.name}>
+                <CardTitle className="text-sm font-bold truncate mb-1" title={file.name}>
                   {file.name}
                 </CardTitle>
                 <div className="flex items-center justify-between mt-4">
@@ -245,11 +243,8 @@ export function FileManager({ user }: { user: User }) {
         ) : (
           <div className="col-span-full py-24 text-center border-2 border-dashed border-primary/10 rounded-2xl bg-muted/20">
             <FileArchive className="h-16 w-16 mx-auto text-primary/20 mb-4" />
-            <h3 className="text-lg font-semibold text-muted-foreground">O cofre está pronto para receber arquivos</h3>
-            <p className="text-sm text-muted-foreground/60 mb-6 px-4">Guarde seus ZIPs aqui. Eles permanecerão salvos mesmo se você sair da conta.</p>
-            <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/5" onClick={() => document.getElementById('file-upload')?.click()}>
-              Guardar Primeiro ZIP
-            </Button>
+            <h3 className="text-lg font-semibold text-muted-foreground">O cofre está pronto</h3>
+            <p className="text-sm text-muted-foreground/60 mb-6">Guarde seus arquivos ZIP aqui. Eles nunca serão apagados sem sua permissão.</p>
           </div>
         )}
       </div>
