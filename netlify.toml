@@ -6,16 +6,9 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Proxy para o Firebase Auth funcionar no domínio da Netlify
+# Proxy para o Firebase Auth funcionar no domínio da Netlify (Habilita o nome bonito no login)
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
   status = 200
   force = true
-
-# Fallback para SPA routes se necessário
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  condition = "Role = admin" # Apenas um exemplo, remova se causar problemas
