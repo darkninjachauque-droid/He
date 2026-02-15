@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -28,8 +28,11 @@ export function AuthScreen() {
   const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string; instruction?: string } | null>(null);
 
   const handleAuthError = (error: any) => {
-    console.error("Auth Error:", error.code, error.message);
-    
+    // Se o usuário fechou o popup, não mostramos erro, apenas paramos o loading
+    if (error.code === 'auth/popup-closed-by-user') {
+      return;
+    }
+
     let errorInfo = {
       code: error.code || 'unknown',
       message: "Ocorreu um problema ao acessar seu cofre HelioTech.",
@@ -38,7 +41,7 @@ export function AuthScreen() {
     };
 
     if (error.code === 'auth/unauthorized-domain') {
-      errorInfo.message = "DOMÍNIO NÃO AUTORIZADO NO GOOGLE!";
+      errorInfo.message = "DOMÍNIO NÃO AUTORIZADO!";
       errorInfo.instruction = `Adicione "heliotech-arquivo-seguro.netlify.app" na lista de Domínios Autorizados no Firebase.`;
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
     } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
