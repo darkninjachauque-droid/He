@@ -13,9 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, Key, Shield, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mail, Loader2, Key, Shield, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function AuthScreen() {
   const auth = useAuth();
@@ -68,7 +67,6 @@ export function AuthScreen() {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        // Enviar verificação de e-mail
         if (userCredential.user) {
           await sendEmailVerification(userCredential.user);
           setVerificationSent(true);
@@ -79,14 +77,21 @@ export function AuthScreen() {
         }
       }
     } catch (error: any) {
-      console.error(error);
       let message = "E-mail ou senha incorretos.";
-      if (error.code === 'auth/email-already-in-use') message = "Este e-mail já está em uso.";
-      if (error.code === 'auth/weak-password') message = "A senha deve ter pelo menos 6 caracteres.";
+      
+      if (error.code === 'auth/email-already-in-use') {
+        message = "Este e-mail já está cadastrado. Tente fazer login ou use outro e-mail.";
+      } else if (error.code === 'auth/weak-password') {
+        message = "A senha deve ter pelo menos 6 caracteres.";
+      } else if (error.code === 'auth/invalid-email') {
+        message = "O formato do e-mail é inválido.";
+      } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        message = "E-mail ou senha não conferem.";
+      }
       
       toast({
         variant: "destructive",
-        title: "Erro de Acesso",
+        title: "Atenção",
         description: message
       });
     } finally {
