@@ -35,9 +35,11 @@ export function AuthScreen() {
   }, []);
 
   const handleAuthError = (error: any) => {
+    console.error("Auth Error:", error.code, error.message);
+    
     let errorInfo = {
       code: error.code || 'unknown',
-      message: "Ocorreu um problema ao acessar seu cofre.",
+      message: "Ocorreu um problema ao acessar seu cofre HelioTech.",
       link: "",
       instruction: ""
     };
@@ -48,7 +50,7 @@ export function AuthScreen() {
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
     } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
       errorInfo.message = "MÉTODO DE LOGIN DESATIVADO!";
-      errorInfo.instruction = "Ative o login por 'E-mail e senha' e 'Google' no painel Authentication > Sign-in method.";
+      errorInfo.instruction = "Ative o login por 'E-mail e senha' e 'Google' no painel do projeto HelioTech.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/invalid-credential') {
       errorInfo.message = "E-mail ou senha incorretos.";
@@ -104,8 +106,8 @@ export function AuthScreen() {
         <div className="mx-auto bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-primary/20 shadow-lg">
           <FileArchive className="h-10 w-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-primary">ZipVault</h1>
-        <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Cofre Seguro de Arquivos</p>
+        <h1 className="text-3xl font-bold tracking-tight text-primary">HelioTech</h1>
+        <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Salva Arquivos ZIP</p>
       </div>
 
       {detailedError && (
@@ -122,7 +124,7 @@ export function AuthScreen() {
             {detailedError.link && (
               <Button variant="destructive" size="sm" className="w-full font-bold" asChild>
                 <a href={detailedError.link} target="_blank" rel="noopener noreferrer">
-                  RESOLVER NO CONSOLE <ExternalLink className="ml-2 h-4 w-4" />
+                  ATIVAR NESTE PROJETO AGORA <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
             )}
@@ -132,11 +134,11 @@ export function AuthScreen() {
 
       <Card className="w-full shadow-xl border-t-4 border-t-primary">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">{isLogin ? 'Entrar no Cofre' : 'Criar Novo Cofre'}</CardTitle>
+          <CardTitle className="text-xl">{isLogin ? 'Entrar no HelioTech' : 'Criar Conta HelioTech'}</CardTitle>
           <CardDescription>
             {isLogin 
-              ? 'Acesse seus arquivos ZIP protegidos.' 
-              : 'Comece a proteger seus ZIPs hoje.'}
+              ? 'Acesse seus arquivos ZIP protegidos por Helio.' 
+              : 'Comece a salvar seus ZIPs hoje.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -176,13 +178,13 @@ export function AuthScreen() {
               </div>
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar no Cofre' : 'Criar Conta'}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar no HelioTech' : 'Criar Conta'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="bg-muted/30 flex justify-center py-4 border-t">
           <Button variant="link" size="sm" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Não tem um cofre? Clique aqui' : 'Já tem um cofre? Faça login'}
+            {isLogin ? 'Não tem conta HelioTech? Clique aqui' : 'Já tem conta? Faça login'}
           </Button>
         </CardFooter>
       </Card>

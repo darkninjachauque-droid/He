@@ -5,8 +5,8 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'ZipVault - Seu Cofre Seguro',
-  description: 'Armazenamento seguro e criptografado para seus arquivos ZIP importantes.',
+  title: 'HelioTech - Salva Arquivos',
+  description: 'Seu cofre pessoal seguro para armazenamento de arquivos ZIP importantes.',
 };
 
 export default function RootLayout({

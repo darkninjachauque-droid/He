@@ -30,7 +30,7 @@ export function FileManager({ user }: { user: User }) {
       toast({
         variant: "destructive",
         title: "Arquivo inválido",
-        description: "Apenas arquivos .ZIP são permitidos no seu cofre."
+        description: "Apenas arquivos .ZIP são permitidos no seu cofre HelioTech."
       });
       return;
     }
@@ -57,7 +57,7 @@ export function FileManager({ user }: { user: User }) {
           dataUri: dataUri,
           createdAt: serverTimestamp(),
         });
-        toast({ title: "Arquivo Salvo!", description: `O arquivo ${file.name} foi guardado permanentemente no seu cofre.` });
+        toast({ title: "Arquivo Salvo!", description: `O arquivo ${file.name} foi guardado permanentemente no cofre de Helio.` });
       } catch (error) {
         toast({ variant: "destructive", title: "Erro ao guardar", description: "Não foi possível salvar o arquivo." });
       } finally {
@@ -71,7 +71,7 @@ export function FileManager({ user }: { user: User }) {
     if (!filesRef) return;
     try {
       await deleteDoc(doc(filesRef, fileId));
-      toast({ title: "Removido", description: "O arquivo foi excluído do seu cofre." });
+      toast({ title: "Removido", description: "O arquivo foi excluído do seu cofre HelioTech." });
     } catch (error) {
       toast({ variant: "destructive", title: "Erro ao excluir", description: "Não foi possível remover o arquivo." });
     }
@@ -85,7 +85,7 @@ export function FileManager({ user }: { user: User }) {
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-primary">
             <ShieldCheck className="h-8 w-8" />
-            Meu Cofre Pessoal
+            Cofre de HelioTech
           </h1>
           <p className="text-muted-foreground mt-1">Seus arquivos ZIP guardados para sempre.</p>
         </div>
@@ -101,7 +101,7 @@ export function FileManager({ user }: { user: User }) {
           <Button asChild disabled={isUploading} size="lg" className="shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90">
             <label htmlFor="file-upload" className="cursor-pointer">
               {isUploading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Upload className="mr-2 h-5 w-5" />}
-              {isUploading ? "Guardando..." : "Novo Arquivo ZIP"}
+              {isUploading ? "Guardando..." : "Salvar Arquivo ZIP"}
             </label>
           </Button>
         </div>
@@ -110,7 +110,7 @@ export function FileManager({ user }: { user: User }) {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
-          placeholder="Pesquisar nos meus arquivos..." 
+          placeholder="Pesquisar no meu cofre HelioTech..." 
           className="pl-10 h-12 bg-card border-2 focus-visible:ring-primary" 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -150,7 +150,7 @@ export function FileManager({ user }: { user: User }) {
                   </span>
                   <div className="flex items-center gap-1 text-[10px] text-primary font-bold">
                     <ShieldCheck className="h-3 w-3" />
-                    GUARDADO
+                    SALVO
                   </div>
                 </div>
               </CardContent>
@@ -159,10 +159,10 @@ export function FileManager({ user }: { user: User }) {
         ) : (
           <div className="col-span-full py-24 text-center border-2 border-dashed rounded-2xl bg-muted/20">
             <FileArchive className="h-16 w-16 mx-auto text-muted-foreground opacity-20 mb-4" />
-            <h3 className="text-lg font-semibold text-muted-foreground">O seu cofre está vazio</h3>
-            <p className="text-sm text-muted-foreground/60 mb-6">Guarde seus arquivos ZIP aqui. Eles nunca sumirão.</p>
+            <h3 className="text-lg font-semibold text-muted-foreground">O cofre de Helio está vazio</h3>
+            <p className="text-sm text-muted-foreground/60 mb-6">Guarde seus arquivos ZIP aqui. HelioTech protege eles.</p>
             <Button variant="outline" onClick={() => document.getElementById('file-upload')?.click()}>
-              Subir primeiro ZIP
+              Salvar Primeiro ZIP
             </Button>
           </div>
         )}

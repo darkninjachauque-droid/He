@@ -27,8 +27,8 @@ export function Header() {
             <FileArchive className="h-6 w-6 text-primary-foreground" />
           </div>
           <div className="flex flex-col -space-y-1">
-            <span className="text-xl font-bold tracking-tight text-primary">ZipVault</span>
-            <span className="text-[10px] uppercase tracking-tighter text-muted-foreground font-bold">Cofre de Arquivos ZIP</span>
+            <span className="text-xl font-bold tracking-tight text-primary">HelioTech</span>
+            <span className="text-[10px] uppercase tracking-tighter text-muted-foreground font-bold">Salva Arquivos ZIP</span>
           </div>
         </div>
 
@@ -36,7 +36,7 @@ export function Header() {
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10">
               <Lock className="h-3 w-3" />
-              <span>Sessão Protegida</span>
+              <span>Sessão Protegida de Helio</span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -51,7 +51,7 @@ export function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-bold leading-none">Minha Conta</p>
+                    <p className="text-sm font-bold leading-none">Minha Conta HelioTech</p>
                     <p className="text-xs leading-none text-muted-foreground truncate">{user.email}</p>
                   </div>
                 </DropdownMenuLabel>
