@@ -6,7 +6,8 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Esta é a ponte necessária para o Google aceitar o seu domínio da Netlify
+# Esta regra cria a PONTE DE SEGURANÇA entre seu site e o Google
+# Ela é obrigatória para remover o erro redirect_uri_mismatch
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
