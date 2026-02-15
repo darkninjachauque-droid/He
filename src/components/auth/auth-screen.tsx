@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, ShieldAlert, CheckCircle2, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -18,7 +18,11 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [apiError, setApiError] = useState<{ message: string; link: string; type: 'enable' | 'blocked' } | null>(null);
+  const [apiError, setApiError] = useState<{ 
+    message: string; 
+    link: string; 
+    type: 'enable' | 'blocked' | 'config' 
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,20 +60,31 @@ export function AuthScreen() {
     const errorMsg = error.message || '';
     const errorCode = error.code || '';
     
-    if (errorMsg.includes('identity-toolkit-api-has-not-been-used') || errorCode.includes('api-not-enabled')) {
+    // Erro de API desativada
+    if (errorCode.includes('identity-toolkit-api-has-not-been-used') || errorCode.includes('api-not-enabled')) {
       setApiError({
         type: 'enable',
-        message: 'A API de Autenticação ainda não foi ativada. Clique no botão abaixo para ativar agora.',
+        message: 'A API de Autenticação precisa ser ativada.',
         link: 'https://console.developers.google.com/apis/api/identitytoolkit.googleapis.com/overview?project=104601029201'
       });
     } 
-    else if (errorMsg.includes('blocked') || errorCode.includes('requests-to-this-api-identitytoolkit-are-blocked')) {
+    // Erro de Restrição de Chave (API Key Restriction)
+    else if (errorCode.includes('requests-to-this-api-identitytoolkit-are-blocked')) {
       setApiError({
         type: 'blocked',
-        message: 'A configuração que você fez na foto parece correta! Certifique-se de ter clicado em "Salvar" e aguarde 5 minutos para o Google aplicar as mudanças.',
+        message: 'A sua Chave de API ainda está bloqueando o login. Verifique as restrições.',
         link: 'https://console.cloud.google.com/apis/credentials?project=104601029201'
       });
-    } else {
+    }
+    // Erro de Provedor não configurado no Firebase (Configuration not found)
+    else if (errorCode.includes('configuration-not-found') || errorCode.includes('project-not-found')) {
+      setApiError({
+        type: 'config',
+        message: 'O login do Google precisa ser ativado no painel do Firebase.',
+        link: 'https://console.firebase.google.com/project/_/authentication/providers'
+      });
+    }
+    else {
       toast({
         variant: "destructive",
         title: "Erro de autenticação",
@@ -99,15 +114,23 @@ export function AuthScreen() {
         </CardHeader>
         <CardContent className="space-y-4">
           {apiError && (
-            <Alert variant="default" className="bg-primary/5 text-primary border-primary/20">
-              <CheckCircle2 className="h-4 w-4" />
-              <AlertTitle className="font-bold">Quase lá!</AlertTitle>
+            <Alert variant="destructive" className="bg-destructive/5 text-destructive border-destructive/20">
+              <Settings className="h-4 w-4" />
+              <AlertTitle className="font-bold">Ação Necessária</AlertTitle>
               <AlertDescription className="space-y-3">
                 <p className="text-xs leading-relaxed">{apiError.message}</p>
-                <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground italic">
-                  <Loader2 className="h-2 w-2 animate-spin" />
-                  <span>Aguardando propagação do Google (pode levar 5 min).</span>
-                </div>
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  className="w-full text-[10px] h-8 font-bold"
+                  onClick={() => window.open(apiError.link, '_blank')}
+                >
+                  <ExternalLink className="mr-1 h-3 w-3" />
+                  ATIVAR NO GOOGLE AGORA
+                </Button>
+                <p className="text-[9px] text-muted-foreground italic text-center">
+                  Após ativar, aguarde 5 minutos e tente novamente.
+                </p>
               </AlertDescription>
             </Alert>
           )}
