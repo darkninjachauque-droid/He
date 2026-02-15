@@ -8,9 +8,3 @@
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
   status = 200
   force = true
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  condition = {role = ["admin"]}
