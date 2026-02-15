@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -12,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, Package, AlertCircle, ExternalLink, Key } from 'lucide-react';
+import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { firebaseConfig } from '@/firebase/config';
@@ -24,24 +25,37 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string } | null>(null);
+  const [currentDomain, setCurrentDomain] = useState('');
+  const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string; instruction?: string } | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentDomain(window.location.hostname);
+    }
+  }, []);
 
   const handleAuthError = (error: any) => {
     let errorInfo = {
       code: error.code || 'unknown',
-      message: "Ocorreu um problema.",
-      link: ""
+      message: "Ocorreu um problema ao acessar seu cofre.",
+      link: "",
+      instruction: ""
     };
 
-    if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-      errorInfo.message = "MÉTODO DE LOGIN NÃO ATIVADO!";
+    if (error.code === 'auth/unauthorized-domain') {
+      errorInfo.message = "DOMÍNIO NÃO AUTORIZADO!";
+      errorInfo.instruction = `Você precisa adicionar "${currentDomain}" à lista de Domínios Autorizados no Firebase.`;
+      errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
+    } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
+      errorInfo.message = "MÉTODO DE LOGIN DESATIVADO!";
+      errorInfo.instruction = "Ative o login por E-mail e Google no painel.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/invalid-credential') {
       errorInfo.message = "E-mail ou senha incorretos.";
     } else if (error.code === 'auth/email-already-in-use') {
       errorInfo.message = "Este e-mail já está sendo usado.";
-    } else {
-      errorInfo.message = error.message || "Erro ao tentar entrar.";
+    } else if (error.code === 'auth/weak-password') {
+      errorInfo.message = "A senha deve ter pelo menos 6 caracteres.";
     }
 
     setDetailedError(errorInfo);
@@ -88,10 +102,10 @@ export function AuthScreen() {
     <div className="flex flex-col items-center justify-center py-10 px-4 max-w-md mx-auto">
       <div className="mb-8 text-center space-y-2">
         <div className="mx-auto bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border border-primary/20 shadow-lg">
-          <Package className="h-10 w-10 text-primary" />
+          <FileArchive className="h-10 w-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-primary">APKFusion</h1>
-        <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Gerenciamento Seguro</p>
+        <h1 className="text-3xl font-bold tracking-tight text-primary">ZipVault</h1>
+        <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Cofre Seguro de Arquivos</p>
       </div>
 
       {detailedError && (
@@ -100,10 +114,15 @@ export function AuthScreen() {
           <AlertTitle className="font-bold">Ação Necessária no Firebase</AlertTitle>
           <AlertDescription className="space-y-3">
             <p className="text-sm font-semibold">{detailedError.message}</p>
+            {detailedError.instruction && (
+              <p className="text-xs bg-destructive/10 p-2 rounded border border-destructive/20 font-mono break-all">
+                {detailedError.instruction}
+              </p>
+            )}
             {detailedError.link && (
               <Button variant="destructive" size="sm" className="w-full font-bold" asChild>
                 <a href={detailedError.link} target="_blank" rel="noopener noreferrer">
-                  ATIVAR PROVEDOR AGORA <ExternalLink className="ml-2 h-4 w-4" />
+                  RESOLVER NO CONSOLE <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
             )}
@@ -113,8 +132,12 @@ export function AuthScreen() {
 
       <Card className="w-full shadow-xl border-t-4 border-t-primary">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">{isLogin ? 'Entrar' : 'Cadastrar'}</CardTitle>
-          <CardDescription>Acesse o painel do APKFusion.</CardDescription>
+          <CardTitle className="text-xl">{isLogin ? 'Entrar no Cofre' : 'Criar Novo Cofre'}</CardTitle>
+          <CardDescription>
+            {isLogin 
+              ? 'Acesse seus arquivos ZIP protegidos.' 
+              : 'Comece a proteger seus ZIPs hoje.'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button 
@@ -142,29 +165,32 @@ export function AuthScreen() {
               <Label>E-mail</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input className="pl-10" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
             </div>
             <div className="space-y-2">
               <Label>Senha</Label>
               <div className="relative">
                 <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input className="pl-10" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input className="pl-10" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar' : 'Cadastrar'}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar no Cofre' : 'Criar Conta'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="bg-muted/30 flex justify-center py-4 border-t">
           <Button variant="link" size="sm" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Não tem conta? Clique aqui' : 'Já tem conta? Login'}
+            {isLogin ? 'Não tem um cofre? Clique aqui' : 'Já tem um cofre? Faça login'}
           </Button>
         </CardFooter>
       </Card>
-      <div className="mt-4 text-[10px] text-muted-foreground opacity-30 font-mono">
-        ID: {firebaseConfig.projectId}
+      <div className="mt-4 flex flex-col items-center gap-1 text-[10px] text-muted-foreground opacity-50 font-mono">
+        <div className="flex items-center gap-1">
+          <ShieldCheck className="h-3 w-3" />
+          <span>PROJETO: {firebaseConfig.projectId}</span>
+        </div>
       </div>
     </div>
   );
