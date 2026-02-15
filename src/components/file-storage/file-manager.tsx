@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'firebase/auth';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,7 +45,7 @@ export function FileManager({ user }: { user: User }) {
   const filesQuery = filesRef ? query(filesRef, orderBy('createdAt', 'desc')) : null;
   const { data: files, loading } = useCollection(filesQuery);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !filesRef) return;
 
@@ -57,12 +59,12 @@ export function FileManager({ user }: { user: User }) {
       return;
     }
 
-    // Limite técnico do Firestore para armazenamento direto em string é de aproximadamente 1MB
+    // Limite técnico do Firestore (1MB)
     if (file.size > 1024 * 1024) { 
       toast({
         variant: "destructive",
         title: "Arquivo muito grande",
-        description: "O limite de armazenamento direto é de 1MB. Arquivos maiores exigem expansão do cofre."
+        description: "O limite deste cofre é de 1MB por arquivo para garantir proteção eterna."
       });
       return;
     }
@@ -75,52 +77,58 @@ export function FileManager({ user }: { user: User }) {
       toast({ variant: "destructive", title: "Erro de leitura", description: "Não foi possível ler o arquivo do seu dispositivo." });
     };
 
-    reader.onload = async (event) => {
+    reader.onload = (event) => {
       const dataUri = event.target?.result as string;
+      const fileData = {
+        name: file.name,
+        type: file.type || 'application/zip',
+        size: file.size,
+        dataUri: dataUri,
+        createdAt: serverTimestamp(),
+      };
       
-      try {
-        await addDoc(filesRef, {
-          name: file.name,
-          type: file.type || 'application/zip',
-          size: file.size,
-          dataUri: dataUri,
-          createdAt: serverTimestamp(),
+      // Operação não-bloqueante (UI Otimista)
+      addDoc(filesRef, fileData)
+        .catch(async (serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: filesRef.path,
+            operation: 'create',
+            requestResourceData: fileData,
+          });
+          errorEmitter.emit('permission-error', permissionError);
         });
-        
-        toast({ 
-          title: "Proteção Ativada!", 
-          description: `O arquivo ${file.name} agora está guardado para sempre no seu cofre.` 
-        });
-      } catch (error) {
-        toast({ 
-          variant: "destructive", 
-          title: "Erro ao guardar", 
-          description: "Ocorreu um erro no servidor. Tente novamente." 
-        });
-      } finally {
-        setIsUploading(false);
-        // Limpa o input para permitir o mesmo arquivo novamente se necessário
-        e.target.value = '';
-      }
+      
+      // Libera a UI imediatamente
+      setIsUploading(false);
+      toast({ 
+        title: "Proteção Ativada!", 
+        description: `O arquivo ${file.name} agora está guardado para sempre no seu cofre.` 
+      });
+      e.target.value = '';
     };
     reader.readAsDataURL(file);
   };
 
-  const handleDelete = async (fileId: string) => {
+  const handleDelete = (fileId: string) => {
     if (!filesRef) return;
-    try {
-      await deleteDoc(doc(filesRef, fileId));
-      toast({ title: "Removido", description: "O arquivo foi excluído do seu cofre." });
-    } catch (error) {
-      toast({ variant: "destructive", title: "Erro ao excluir", description: "Não foi possível remover o arquivo." });
-    }
+    const docRef = doc(filesRef, fileId);
+
+    deleteDoc(docRef)
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+
+    toast({ title: "Removido", description: "O arquivo foi excluído do seu cofre." });
   };
 
   const filteredFiles = files?.filter(f => f.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Aviso de E-mail não verificado */}
       {!user.emailVerified && !user.providerData.some(p => p.providerId === 'google.com') && (
         <Alert variant="destructive" className="bg-destructive/10 border-destructive/50 text-destructive">
           <MailWarning className="h-4 w-4" />
@@ -199,19 +207,19 @@ export function FileManager({ user }: { user: User }) {
                       <AlertDialogHeader>
                         <AlertDialogTitle className="flex items-center gap-2 text-foreground">
                           <AlertTriangle className="h-5 w-5 text-destructive" />
-                          Tem certeza absoluta?
+                          Segurança do Cofre
                         </AlertDialogTitle>
                         <AlertDialogDescription className="text-muted-foreground">
-                          Esta ação não pode ser desfeita. O arquivo <strong className="text-foreground">{file.name}</strong> será removido permanentemente do seu cofre.
+                          O arquivo <strong className="text-foreground">{file.name}</strong> está protegido. Tem certeza que deseja removê-lo permanentemente?
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="hover:bg-accent text-foreground">Manter Arquivo</AlertDialogCancel>
+                        <AlertDialogCancel className="hover:bg-accent text-foreground">Manter no Cofre</AlertDialogCancel>
                         <AlertDialogAction 
                           onClick={() => handleDelete(file.id)}
                           className="bg-destructive hover:bg-destructive/90 text-white font-bold"
                         >
-                          Excluir Agora
+                          Apagar Agora
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
