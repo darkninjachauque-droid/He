@@ -37,19 +37,19 @@ export function AuthScreen() {
       debug: ""
     };
 
-    // Erro específico de configuração não encontrada (Provedor Google não ativo)
+    // Erro específico de configuração não encontrada (Provedor Google ou E-mail não ativos no projeto correto)
     if (error.code === 'auth/configuration-not-found') {
-      errorInfo.message = `O login do Google não está ativo para o projeto "${firebaseConfig.projectId}". Você deve ativar o provedor Google EXATAMENTE para este ID de projeto no console do Firebase.`;
+      errorInfo.message = `Atenção: O login não está ativo para o projeto "${firebaseConfig.projectId}". Você deve ativar os provedores (Google e E-mail) EXATAMENTE para este ID de projeto no console do Firebase.`;
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
-      errorInfo.debug = `Projeto atual no código: ${firebaseConfig.projectId}`;
+      errorInfo.debug = `O código do seu site está tentando usar o Projeto ID: ${firebaseConfig.projectId}. Verifique se você não ativou o Google em um projeto diferente por engano.`;
     } else if (error.code === 'auth/operation-not-allowed') {
-      errorInfo.message = "O provedor de login (Google ou E-mail) ainda não foi habilitado no painel do Firebase.";
+      errorInfo.message = "Este método de login (E-mail ou Google) está desativado no painel do Firebase para este projeto.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/unauthorized-domain') {
-      errorInfo.message = "Este domínio não está autorizado no Firebase. Adicione o domínio atual em 'Domínios Autorizados' nas configurações de Autenticação.";
+      errorInfo.message = "Este domínio não está autorizado. Adicione o link atual em 'Domínios Autorizados' no painel do Firebase.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
     } else if (error.code === 'auth/popup-blocked') {
-      errorInfo.message = "O seu navegador bloqueou a janela de login. Por favor, libere os pop-ups e tente novamente.";
+      errorInfo.message = "O navegador bloqueou a janela de login. Por favor, libere os pop-ups.";
     } else {
       errorInfo.message = error.message || "Erro desconhecido ao tentar entrar.";
     }
@@ -109,22 +109,22 @@ export function AuthScreen() {
       </div>
 
       {detailedError && (
-        <Alert variant="destructive" className="mb-6 animate-in slide-in-from-top-2 border-2">
+        <Alert variant="destructive" className="mb-6 animate-in slide-in-from-top-2 border-2 shadow-lg">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-bold">Ação Necessária</AlertTitle>
+          <AlertTitle className="font-bold">Ação Necessária no Projeto</AlertTitle>
           <AlertDescription className="space-y-4">
-            <p className="text-sm">{detailedError.message}</p>
+            <p className="text-sm leading-relaxed">{detailedError.message}</p>
             
             {detailedError.debug && (
-              <div className="bg-destructive/5 p-2 rounded text-[10px] font-mono border border-destructive/10">
-                DEBUG: {detailedError.debug}
+              <div className="bg-destructive/10 p-3 rounded text-[11px] font-mono border border-destructive/20 text-destructive-foreground">
+                <strong>DEBUG:</strong> {detailedError.debug}
               </div>
             )}
 
             {detailedError.link && (
-              <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90" asChild>
+              <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90 font-bold" asChild>
                 <a href={detailedError.link} target="_blank" rel="noopener noreferrer">
-                  Corrigir Agora no Painel <ExternalLink className="ml-2 h-3 w-3" />
+                  CONFIGURAR PROJETO AGORA <ExternalLink className="ml-2 h-3 w-3" />
                 </a>
               </Button>
             )}
@@ -197,21 +197,29 @@ export function AuthScreen() {
             </div>
             <Button type="submit" className="w-full h-11 font-bold shadow-lg shadow-primary/20" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLogin ? 'Abrir Cofre' : 'Criar Cofre e Entrar'}
+              {isLogin ? 'Abrir Cofre' : 'Registrar e Abrir'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col pt-4 border-t bg-muted/20">
-          <Button variant="link" className="text-sm text-primary" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Não tem conta? Crie uma aqui' : 'Já tem conta? Faça o login'}
+          <Button variant="link" className="text-sm text-primary font-medium" onClick={() => setIsLogin(!isLogin)}>
+            {isLogin ? 'Não tem conta? Crie um cofre aqui' : 'Já tem um cofre? Faça o login'}
           </Button>
         </CardFooter>
       </Card>
 
-      <div className="mt-8 p-4 bg-muted/30 rounded-lg border border-dashed flex items-center gap-3">
-        <Settings className="h-4 w-4 text-muted-foreground" />
-        <p className="text-[10px] text-muted-foreground">
-          Configurado para o Projeto: <span className="font-mono font-bold text-primary">{firebaseConfig.projectId}</span>
+      <div className="mt-8 p-4 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center gap-2">
+        <div className="flex items-center gap-2">
+          <Settings className="h-4 w-4 text-muted-foreground" />
+          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+            ID do Projeto no Código:
+          </p>
+        </div>
+        <p className="font-mono font-bold text-primary text-sm bg-white px-3 py-1 rounded-md border">
+          {firebaseConfig.projectId}
+        </p>
+        <p className="text-[9px] text-muted-foreground text-center">
+          Certifique-se de que este é o mesmo ID que aparece no topo do seu Console do Firebase.
         </p>
       </div>
     </div>
