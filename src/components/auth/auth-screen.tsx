@@ -28,6 +28,7 @@ export function AuthScreen() {
   const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string; instruction?: string } | null>(null);
 
   const handleAuthError = (error: any) => {
+    // Silencia o erro se o usuário apenas fechar o popup
     if (error.code === 'auth/popup-closed-by-user') {
       return;
     }
