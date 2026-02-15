@@ -5,8 +5,8 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'APKFusion - Gerenciamento de APKs',
-  description: 'Injeção inteligente de arquivos em APKs com segurança AI.',
+  title: 'ZipVault - Seu Cofre Seguro',
+  description: 'Armazenamento seguro e criptografado para seus arquivos ZIP importantes.',
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-body antialiased min-h-screen bg-background">
+      <body className="font-body antialiased min-h-screen bg-background text-foreground">
         <FirebaseClientProvider>
           {children}
           <Toaster />

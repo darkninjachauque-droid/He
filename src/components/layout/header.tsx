@@ -3,7 +3,7 @@
 
 import { useAuth, useUser } from '@/firebase';
 import { signOut } from 'firebase/auth';
-import { ShieldCheck, LogOut, User, Lock, Package } from 'lucide-react';
+import { LogOut, User, Lock, FileArchive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -23,20 +23,20 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <div className="bg-primary p-2 rounded-lg shadow-inner">
-            <Package className="h-6 w-6 text-primary-foreground" />
+          <div className="bg-primary p-2 rounded-lg shadow-md">
+            <FileArchive className="h-6 w-6 text-primary-foreground" />
           </div>
           <div className="flex flex-col -space-y-1">
-            <span className="text-xl font-bold tracking-tight text-primary">APKFusion</span>
-            <span className="text-[10px] uppercase tracking-tighter text-muted-foreground font-bold">Secure Injection</span>
+            <span className="text-xl font-bold tracking-tight text-primary">ZipVault</span>
+            <span className="text-[10px] uppercase tracking-tighter text-muted-foreground font-bold">Cofre de Arquivos ZIP</span>
           </div>
         </div>
 
         {user && (
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-green-600 bg-green-50 px-3 py-1.5 rounded-full border border-green-100">
+            <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-primary bg-primary/5 px-3 py-1.5 rounded-full border border-primary/10">
               <Lock className="h-3 w-3" />
-              <span>Sessão Ativa</span>
+              <span>Sessão Protegida</span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -58,7 +58,7 @@ export function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer" onClick={() => auth && signOut(auth)}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
+                  <span>Sair do Cofre</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
