@@ -2,7 +2,7 @@
 'use client';
 
 import { useUser } from '@/firebase';
-import { FileManager } from '@/components/file-storage/file-manager';
+import { APKFusionDashboard } from '@/components/apk-fusion/apk-fusion-dashboard';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { Header } from '@/components/layout/header';
 import { Loader2 } from 'lucide-react';
@@ -22,10 +22,10 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
-        {user ? <FileManager user={user} /> : <AuthScreen />}
+        {user ? <APKFusionDashboard /> : <AuthScreen />}
       </main>
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} Meu Vault Privado. Todos os direitos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} APKFusion. Todos os direitos reservados.</p>
       </footer>
     </div>
   );

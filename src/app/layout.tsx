@@ -5,8 +5,8 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'MeuVault - Armazenamento Privado',
-  description: 'Guarde seus arquivos pessoais com total segurança e privacidade.',
+  title: 'APKFusion - Gerenciamento de APKs',
+  description: 'Injeção inteligente de arquivos em APKs com segurança AI.',
 };
 
 export default function RootLayout({

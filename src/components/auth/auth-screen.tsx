@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -12,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, Settings, AlertTriangle } from 'lucide-react';
+import { Lock, Mail, Loader2, Package, AlertCircle, ExternalLink, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { firebaseConfig } from '@/firebase/config';
@@ -31,22 +32,22 @@ export function AuthScreen() {
     
     let errorInfo = {
       code: error.code || 'unknown',
-      message: "Ocorreu um problema ao tentar acessar o seu cofre.",
+      message: "Ocorreu um problema ao tentar acessar o sistema.",
       link: "",
       debug: ""
     };
 
     if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
       errorInfo.message = `LOGIN NÃO ATIVADO NO PAINEL!`;
-      errorInfo.debug = `Você precisa ativar o login por Google ou E-mail no seu projeto "${firebaseConfig.projectId}".`;
+      errorInfo.debug = `Você precisa ativar o provedor (Google ou E-mail) no painel do Firebase para este projeto.`;
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/unauthorized-domain') {
-      errorInfo.message = "Domínio não autorizado. Adicione o link do site no painel do Firebase.";
+      errorInfo.message = "Domínio não autorizado no Firebase.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
     } else if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-      errorInfo.message = "Cofre não encontrado ou credenciais inválidas. Verifique seu e-mail e senha.";
-    } else if (error.code === 'auth/wrong-password') {
-      errorInfo.message = "Senha incorreta para este cofre.";
+      errorInfo.message = "E-mail ou senha incorretos. Verifique suas credenciais.";
+    } else if (error.code === 'auth/email-already-in-use') {
+      errorInfo.message = "Este e-mail já está cadastrado. Tente fazer login.";
     } else {
       errorInfo.message = error.message || "Erro ao tentar entrar.";
     }
@@ -68,7 +69,6 @@ export function AuthScreen() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
-      toast({ title: "Bem-vindo!", description: "Seu cofre foi aberto." });
     } catch (error: any) {
       handleAuthError(error);
     } finally {
@@ -87,7 +87,6 @@ export function AuthScreen() {
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
       }
-      toast({ title: "Sucesso!", description: "Cofre desbloqueado." });
     } catch (error: any) {
       handleAuthError(error);
     } finally {
@@ -99,10 +98,10 @@ export function AuthScreen() {
     <div className="flex flex-col items-center justify-center py-10 px-4 max-w-md mx-auto">
       <div className="mb-8 text-center space-y-2 animate-in fade-in zoom-in duration-500">
         <div className="mx-auto bg-primary/10 w-20 h-20 rounded-3xl flex items-center justify-center mb-4 shadow-xl border border-primary/20">
-          <ShieldCheck className="h-12 w-12 text-primary" />
+          <Package className="h-12 w-12 text-primary" />
         </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-primary">MeuVault</h1>
-        <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold">Acessando: APKFusion</p>
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">APKFusion</h1>
+        <p className="text-muted-foreground text-sm uppercase tracking-widest font-bold">Plataforma de Injeção Segura</p>
       </div>
 
       {detailedError && (
@@ -116,9 +115,9 @@ export function AuthScreen() {
               <div className="flex items-center gap-1 mb-2 font-bold uppercase text-amber-600">
                 <AlertTriangle className="h-4 w-4" /> Diagnóstico:
               </div>
-              ID do Projeto: {firebaseConfig.projectId}
+              ID do Projeto no código: {firebaseConfig.projectId}
               <br />
-              {detailedError.debug || "Verifique se este projeto tem o login ativado no Console."}
+              {detailedError.debug || "Verifique as permissões deste projeto no Console."}
             </div>
 
             {detailedError.link && (
@@ -134,9 +133,9 @@ export function AuthScreen() {
 
       <Card className="w-full shadow-2xl border-none bg-card/80 backdrop-blur-md overflow-hidden ring-1 ring-black/5">
         <CardHeader className="space-y-1 text-center pb-8 bg-primary/5 border-b">
-          <CardTitle className="text-2xl font-bold">{isLogin ? 'Abrir Cofre' : 'Criar Novo Cofre'}</CardTitle>
+          <CardTitle className="text-2xl font-bold">{isLogin ? 'Entrar no APKFusion' : 'Criar Nova Conta'}</CardTitle>
           <CardDescription>
-            Segurança total no projeto APKFusion.
+            Acesse suas ferramentas de modificação.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-8">
@@ -167,21 +166,21 @@ export function AuthScreen() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
-              <Input id="email" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input id="email" type="email" placeholder="ex: darkninjachauque@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input id="password" type="password" placeholder="Sua senha" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLogin ? 'Entrar' : 'Criar Conta'}
+              {isLogin ? 'Entrar' : 'Cadastrar'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col pt-4 border-t bg-muted/20">
           <Button variant="link" className="text-xs" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Não tem conta? Crie aqui' : 'Já tem conta? Faça login'}
+            {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
           </Button>
         </CardFooter>
       </Card>
