@@ -5,7 +5,7 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# PONTE DE SEGURANÇA: Redireciona a autenticação para o Firebase através do seu domínio Netlify
+# PONTE DE SEGURANÇA OBRIGATÓRIA: Redireciona a autenticação para o Firebase
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"

@@ -33,10 +33,11 @@ export function AuthScreen() {
   const handleAuthError = (error: any) => {
     if (error.code === 'auth/popup-closed-by-user') return;
 
+    // Se o erro for de redirect_uri_mismatch, mostramos as instruções exatas
     if (error.code === 'auth/redirect-uri-mismatch' || error.message?.includes('redirect_uri_mismatch')) {
       setErrorInfo({
-        title: "Erro de Configuração no Google",
-        message: "O Google bloqueou o acesso porque os links no console dele estão com erros de digitação. Copie os links abaixo e cole no seu Console do Google Cloud.",
+        title: "Ajuste Necessário no Google",
+        message: "O Google ainda não reconheceu seu link. Copie os dois links abaixo e cole nos campos correspondentes do seu Console do Google Cloud.",
         code: error.code
       });
     } else {
@@ -92,24 +93,24 @@ export function AuthScreen() {
 
       {errorInfo && (
         <Alert variant="destructive" className="mb-6 border-2 shadow-lg bg-destructive/10 text-white animate-in slide-in-from-top-4">
-          <AlertCircle className="h-5 w-5" />
+          <AlertCircle className="h-5 w-5 text-red-400" />
           <AlertTitle className="font-bold">{errorInfo.title}</AlertTitle>
           <AlertDescription className="space-y-4 pt-2">
-            <p className="text-sm">{errorInfo.message}</p>
+            <p className="text-sm">Abra seu Google Console e cole estes links nos campos certos:</p>
             
             <div className="space-y-3">
               <div>
-                <p className="text-[10px] font-bold uppercase mb-1 text-primary">1. ORIGEM JAVASCRIPT:</p>
+                <p className="text-[10px] font-bold uppercase mb-1 text-primary">CAMPO 1: ORIGENS JAVASCRIPT</p>
                 <div className="flex gap-2">
-                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all select-all">https://heliotech-arquivo-seguro.netlify.app</code>
+                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app</code>
                   <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app')}><Copy className="h-3 w-3" /></Button>
                 </div>
               </div>
               
               <div>
-                <p className="text-[10px] font-bold uppercase mb-1 text-primary">2. URI DE REDIRECIONAMENTO:</p>
+                <p className="text-[10px] font-bold uppercase mb-1 text-primary">CAMPO 2: REDIRECIONAMENTO</p>
                 <div className="flex gap-2">
-                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all select-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
+                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
                   <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app/__/auth/handler')}><Copy className="h-3 w-3" /></Button>
                 </div>
               </div>
@@ -117,7 +118,7 @@ export function AuthScreen() {
 
             <Button variant="outline" size="sm" className="w-full font-bold border-white/20 hover:bg-white/10" asChild>
               <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">
-                ABRIR CONSOLE DO GOOGLE <ExternalLink className="ml-2 h-4 w-4" />
+                ABRIR MEU CONSOLE DO GOOGLE <ExternalLink className="ml-2 h-4 w-4" />
               </a>
             </Button>
           </AlertDescription>

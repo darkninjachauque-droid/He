@@ -2,7 +2,7 @@
 
 export const firebaseConfig = {
   apiKey: "AIzaSyBso-PWibFZmgxAAH26DQxUinlBjjD5p-g",
-  // Este é o segredo para o seu nome profissional aparecer no Google
+  // O authDomain deve ser EXATAMENTE o seu domínio da Netlify para o nome profissional aparecer
   authDomain: "heliotech-arquivo-seguro.netlify.app",
   projectId: "studio-9995869127-3ea67",
   storageBucket: "studio-9995869127-3ea67.firebasestorage.app",
