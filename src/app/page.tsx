@@ -6,9 +6,15 @@ import { AuthScreen } from '@/components/auth/auth-screen';
 import { VerificationPending } from '@/components/auth/verification-pending';
 import { Header } from '@/components/layout/header';
 import { Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function HomePage() {
   const { user, loading } = useUser();
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   if (loading) {
     return (
@@ -35,7 +41,7 @@ export default function HomePage() {
         {renderContent()}
       </main>
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} HelioTech - Arquivo Seguro. Todos os direitos reservados.</p>
+        <p>&copy; {currentYear || '...'} HelioTech - Arquivo Seguro. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
