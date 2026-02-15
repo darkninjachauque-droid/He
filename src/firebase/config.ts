@@ -1,8 +1,9 @@
+
 'use client';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyBso-PWibFZmgxAAH26DQxUinlBjjD5p-g",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "studio-9995869127-3ea67.firebaseapp.com",
+  authDomain: "heliotech-arquivo-seguro.netlify.app", // Atualizado para o seu domínio do Netlify
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "studio-9995869127-3ea67",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "studio-9995869127-3ea67.firebasestorage.app",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "714918776457",
