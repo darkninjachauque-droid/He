@@ -1,8 +1,8 @@
-
 'use client';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyBso-PWibFZmgxAAH26DQxUinlBjjD5p-g",
+  // Usamos o domínio da Netlify aqui para o nome profissional aparecer no Google
   authDomain: "heliotech-arquivo-seguro.netlify.app",
   projectId: "studio-9995869127-3ea67",
   storageBucket: "studio-9995869127-3ea67.firebasestorage.app",

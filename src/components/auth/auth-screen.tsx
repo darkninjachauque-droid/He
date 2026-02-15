@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -13,10 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, ShieldCheck } from 'lucide-react';
+import { Mail, Loader2, FileArchive, AlertCircle, ExternalLink, Key, ShieldCheck, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { firebaseConfig } from '@/firebase/config';
 
 export function AuthScreen() {
   const auth = useAuth();
@@ -25,43 +23,36 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string; instruction?: string } | null>(null);
+  const [errorInfo, setErrorInfo] = useState<{ title: string, message: string, code: string, link: string } | null>(null);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copiado!", description: "Endereço copiado para a área de transferência." });
+  };
 
   const handleAuthError = (error: any) => {
-    // Silencia o erro se o usuário apenas fechar o popup
-    if (error.code === 'auth/popup-closed-by-user') {
-      return;
+    if (error.code === 'auth/popup-closed-by-user') return;
+
+    if (error.code === 'auth/redirect-uri-mismatch' || error.message.includes('redirect_uri_mismatch')) {
+      setErrorInfo({
+        title: "Erro de Configuração no Google",
+        message: "O endereço configurado no console do Google está incorreto. Copie os links abaixo e cole no seu console do Google Cloud.",
+        code: error.code,
+        link: "https://console.cloud.google.com/apis/credentials"
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Erro de Acesso",
+        description: error.message
+      });
     }
-
-    let errorInfo = {
-      code: error.code || 'unknown',
-      message: "Ocorreu um problema ao acessar seu cofre HelioTech.",
-      link: "",
-      instruction: ""
-    };
-
-    if (error.code === 'auth/unauthorized-domain') {
-      errorInfo.message = "DOMÍNIO NÃO AUTORIZADO!";
-      errorInfo.instruction = `Adicione "heliotech-arquivo-seguro.netlify.app" na lista de Domínios Autorizados no Firebase.`;
-      errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
-    } else if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-      errorInfo.message = "MÉTODO DE LOGIN DESATIVADO!";
-      errorInfo.instruction = "Ative o login por 'E-mail e senha' no painel do Firebase.";
-      errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
-    }
-
-    setDetailedError(errorInfo);
-    toast({
-      variant: "destructive",
-      title: "Erro de Acesso",
-      description: error.code
-    });
   };
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
     setLoading(true);
-    setDetailedError(null);
+    setErrorInfo(null);
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -76,7 +67,7 @@ export function AuthScreen() {
     e.preventDefault();
     if (!auth) return;
     setLoading(true);
-    setDetailedError(null);
+    setErrorInfo(null);
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -100,24 +91,36 @@ export function AuthScreen() {
         <p className="text-primary text-[10px] uppercase tracking-widest font-bold">Arquivo Seguro • Modo Cofre</p>
       </div>
 
-      {detailedError && (
+      {errorInfo && (
         <Alert variant="destructive" className="mb-6 border-2 shadow-lg bg-destructive/10 text-white animate-in slide-in-from-top-4">
           <AlertCircle className="h-5 w-5" />
-          <AlertTitle className="font-bold">Ação Necessária</AlertTitle>
-          <AlertDescription className="space-y-3">
-            <p className="text-sm">{detailedError.message}</p>
-            {detailedError.instruction && (
-              <p className="text-xs bg-black/40 p-2 rounded border border-white/10 font-mono break-all font-bold">
-                {detailedError.instruction}
-              </p>
-            )}
-            {detailedError.link && (
-              <Button variant="destructive" size="sm" className="w-full font-bold" asChild>
-                <a href={detailedError.link} target="_blank" rel="noopener noreferrer">
-                  ABRIR PAINEL DO FIREBASE <ExternalLink className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            )}
+          <AlertTitle className="font-bold">{errorInfo.title}</AlertTitle>
+          <AlertDescription className="space-y-4 pt-2">
+            <p className="text-sm">{errorInfo.message}</p>
+            
+            <div className="space-y-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase mb-1">Origem JavaScript:</p>
+                <div className="flex gap-2">
+                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app</code>
+                  <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app')}><Copy className="h-3 w-3" /></Button>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-[10px] font-bold uppercase mb-1">URI de Redirecionamento:</p>
+                <div className="flex gap-2">
+                  <code className="flex-1 text-[10px] bg-black/40 p-2 rounded border border-white/10 break-all">https://heliotech-arquivo-seguro.netlify.app/__/auth/handler</code>
+                  <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => copyToClipboard('https://heliotech-arquivo-seguro.netlify.app/__/auth/handler')}><Copy className="h-3 w-3" /></Button>
+                </div>
+              </div>
+            </div>
+
+            <Button variant="destructive" size="sm" className="w-full font-bold" asChild>
+              <a href={errorInfo.link} target="_blank" rel="noopener noreferrer">
+                ABRIR CONSOLE DO GOOGLE <ExternalLink className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
           </AlertDescription>
         </Alert>
       )}
@@ -178,14 +181,6 @@ export function AuthScreen() {
           </Button>
         </CardFooter>
       </Card>
-      
-      <div className="mt-8 flex flex-col items-center gap-2 text-[10px] text-muted-foreground/50 font-mono">
-        <div className="flex items-center gap-1">
-          <ShieldCheck className="h-3 w-3" />
-          <span>SISTEMA HELIOTECH V1.0</span>
-        </div>
-        <p>Acesso Protegido via Netlify SSL</p>
-      </div>
     </div>
   );
 }

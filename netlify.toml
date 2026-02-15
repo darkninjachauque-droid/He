@@ -1,4 +1,3 @@
-
 [build]
   command = "npm run build"
   publish = ".next"
@@ -7,7 +6,7 @@
   package = "@netlify/plugin-nextjs"
 
 # Esta regra cria a PONTE DE SEGURANÇA entre seu site e o Google
-# Ela é obrigatória para remover o erro redirect_uri_mismatch
+# Ela redireciona as chamadas de autenticação do seu domínio Netlify para o Firebase
 [[redirects]]
   from = "/__/auth/*"
   to = "https://studio-9995869127-3ea67.firebaseapp.com/__/auth/:splat"
