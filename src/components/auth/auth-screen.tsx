@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -13,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Loader2, Package, AlertCircle, ExternalLink, AlertTriangle, Key } from 'lucide-react';
+import { Mail, Loader2, Package, AlertCircle, ExternalLink, Key } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { firebaseConfig } from '@/firebase/config';
@@ -25,21 +24,17 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string; debug?: string } | null>(null);
+  const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string } | null>(null);
 
   const handleAuthError = (error: any) => {
-    console.error("Auth Error:", error.code, error.message);
-    
     let errorInfo = {
       code: error.code || 'unknown',
-      message: "Ocorreu um problema de configuração.",
-      link: "",
-      debug: ""
+      message: "Ocorreu um problema.",
+      link: ""
     };
 
     if (error.code === 'auth/configuration-not-found' || error.code === 'auth/operation-not-allowed') {
-      errorInfo.message = `LOGIN NÃO ATIVADO NO FIREBASE!`;
-      errorInfo.debug = `Você precisa ir no projeto do Firebase e ativar o 'E-mail/Senha' ou 'Google'.`;
+      errorInfo.message = "MÉTODO DE LOGIN NÃO ATIVADO!";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/invalid-credential') {
       errorInfo.message = "E-mail ou senha incorretos.";
@@ -50,7 +45,6 @@ export function AuthScreen() {
     }
 
     setDetailedError(errorInfo);
-    
     toast({
       variant: "destructive",
       title: "Erro de Acesso",
@@ -97,24 +91,19 @@ export function AuthScreen() {
           <Package className="h-10 w-10 text-primary" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-primary">APKFusion</h1>
-        <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Gestão de APKs Segura</p>
+        <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Gerenciamento Seguro</p>
       </div>
 
       {detailedError && (
         <Alert variant="destructive" className="mb-6 border-2 shadow-lg bg-destructive/5">
           <AlertCircle className="h-5 w-5" />
-          <AlertTitle className="font-bold">Ação Necessária no Painel</AlertTitle>
+          <AlertTitle className="font-bold">Ação Necessária no Firebase</AlertTitle>
           <AlertDescription className="space-y-3">
             <p className="text-sm font-semibold">{detailedError.message}</p>
-            <div className="text-[10px] font-mono bg-white/50 p-2 rounded border border-destructive/20">
-              Projeto ID: {firebaseConfig.projectId}
-              <br />
-              App ID: {firebaseConfig.appId.substring(0, 15)}...
-            </div>
             {detailedError.link && (
               <Button variant="destructive" size="sm" className="w-full font-bold" asChild>
                 <a href={detailedError.link} target="_blank" rel="noopener noreferrer">
-                  ATIVAR NESTE PROJETO AGORA <ExternalLink className="ml-2 h-4 w-4" />
+                  ATIVAR PROVEDOR AGORA <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
             )}
@@ -125,7 +114,7 @@ export function AuthScreen() {
       <Card className="w-full shadow-xl border-t-4 border-t-primary">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">{isLogin ? 'Entrar' : 'Cadastrar'}</CardTitle>
-          <CardDescription>Use sua conta para acessar o cofre.</CardDescription>
+          <CardDescription>Acesse o painel do APKFusion.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button 
@@ -164,20 +153,18 @@ export function AuthScreen() {
               </div>
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar Agora' : 'Criar Minha Conta'}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : isLogin ? 'Entrar' : 'Cadastrar'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="bg-muted/30 flex justify-center py-4 border-t">
           <Button variant="link" size="sm" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Ainda não tem conta? Clique aqui' : 'Já tem conta? Faça login'}
+            {isLogin ? 'Não tem conta? Clique aqui' : 'Já tem conta? Login'}
           </Button>
         </CardFooter>
       </Card>
-
-      <div className="mt-8 text-center opacity-50">
-        <p className="text-[10px] font-bold uppercase tracking-tighter">Conectado ao Projeto:</p>
-        <p className="text-[11px] font-mono">{firebaseConfig.projectId}</p>
+      <div className="mt-4 text-[10px] text-muted-foreground opacity-30 font-mono">
+        ID: {firebaseConfig.projectId}
       </div>
     </div>
   );
