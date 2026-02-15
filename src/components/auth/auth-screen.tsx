@@ -28,7 +28,6 @@ export function AuthScreen() {
   const [detailedError, setDetailedError] = useState<{ code: string; message: string; link?: string; instruction?: string } | null>(null);
 
   const handleAuthError = (error: any) => {
-    // Se o usuário fechou o popup, não mostramos erro, apenas paramos o loading
     if (error.code === 'auth/popup-closed-by-user') {
       return;
     }
