@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, Settings } from 'lucide-react';
+import { Lock, Mail, Loader2, ShieldCheck, AlertCircle, ExternalLink, Settings, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { firebaseConfig } from '@/firebase/config';
@@ -37,21 +37,18 @@ export function AuthScreen() {
       debug: ""
     };
 
-    // Erro específico de configuração não encontrada (Provedor Google ou E-mail não ativos no projeto correto)
     if (error.code === 'auth/configuration-not-found') {
-      errorInfo.message = `Atenção: O login não está ativo para o projeto "${firebaseConfig.projectId}". Você deve ativar os provedores (Google e E-mail) EXATAMENTE para este ID de projeto no console do Firebase.`;
+      errorInfo.message = `CONFLITO DE PROJETOS: O seu site está tentando usar o projeto "${firebaseConfig.projectId}", mas você está configurando o projeto "project-714918776457" no seu celular.`;
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
-      errorInfo.debug = `O código do seu site está tentando usar o Projeto ID: ${firebaseConfig.projectId}. Verifique se você não ativou o Google em um projeto diferente por engano.`;
+      errorInfo.debug = `O ID no código do site é "${firebaseConfig.projectId}". Na sua imagem, o ID é diferente. Você deve ativar o Google no projeto "${firebaseConfig.projectId}" ou me enviar a nova configuração.`;
     } else if (error.code === 'auth/operation-not-allowed') {
-      errorInfo.message = "Este método de login (E-mail ou Google) está desativado no painel do Firebase para este projeto.";
+      errorInfo.message = "O login do Google não foi ativado no painel deste projeto.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
     } else if (error.code === 'auth/unauthorized-domain') {
-      errorInfo.message = "Este domínio não está autorizado. Adicione o link atual em 'Domínios Autorizados' no painel do Firebase.";
+      errorInfo.message = "Domínio não autorizado. Adicione o link do site no painel do Firebase.";
       errorInfo.link = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
-    } else if (error.code === 'auth/popup-blocked') {
-      errorInfo.message = "O navegador bloqueou a janela de login. Por favor, libere os pop-ups.";
     } else {
-      errorInfo.message = error.message || "Erro desconhecido ao tentar entrar.";
+      errorInfo.message = error.message || "Erro ao tentar entrar.";
     }
 
     setDetailedError(errorInfo);
@@ -71,7 +68,7 @@ export function AuthScreen() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
-      toast({ title: "Bem-vindo!", description: "Seu cofre foi aberto com Google." });
+      toast({ title: "Bem-vindo!", description: "Seu cofre foi aberto." });
     } catch (error: any) {
       handleAuthError(error);
     } finally {
@@ -90,7 +87,7 @@ export function AuthScreen() {
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
       }
-      toast({ title: "Sucesso!", description: "Seu cofre foi desbloqueado." });
+      toast({ title: "Sucesso!", description: "Cofre desbloqueado." });
     } catch (error: any) {
       handleAuthError(error);
     } finally {
@@ -111,20 +108,21 @@ export function AuthScreen() {
       {detailedError && (
         <Alert variant="destructive" className="mb-6 animate-in slide-in-from-top-2 border-2 shadow-lg">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle className="font-bold">Ação Necessária no Projeto</AlertTitle>
+          <AlertTitle className="font-bold uppercase tracking-wider">Ação Necessária no Console</AlertTitle>
           <AlertDescription className="space-y-4">
-            <p className="text-sm leading-relaxed">{detailedError.message}</p>
+            <p className="text-sm leading-relaxed font-semibold">{detailedError.message}</p>
             
-            {detailedError.debug && (
-              <div className="bg-destructive/10 p-3 rounded text-[11px] font-mono border border-destructive/20 text-destructive-foreground">
-                <strong>DEBUG:</strong> {detailedError.debug}
+            <div className="bg-destructive/10 p-3 rounded text-[11px] font-mono border border-destructive/20 text-destructive-foreground">
+              <div className="flex items-center gap-1 mb-1 text-amber-600 font-bold uppercase">
+                <AlertTriangle className="h-3 w-3" /> Por que o erro ocorre?
               </div>
-            )}
+              {detailedError.debug}
+            </div>
 
             {detailedError.link && (
               <Button variant="default" size="sm" className="w-full bg-destructive text-white hover:bg-destructive/90 font-bold" asChild>
                 <a href={detailedError.link} target="_blank" rel="noopener noreferrer">
-                  CONFIGURAR PROJETO AGORA <ExternalLink className="ml-2 h-3 w-3" />
+                  ABRIR PAINEL DO PROJETO CORRETO <ExternalLink className="ml-2 h-3 w-3" />
                 </a>
               </Button>
             )}
@@ -136,7 +134,7 @@ export function AuthScreen() {
         <CardHeader className="space-y-1 text-center pb-8 bg-primary/5 border-b">
           <CardTitle className="text-2xl font-bold">{isLogin ? 'Abrir Cofre' : 'Criar Novo Cofre'}</CardTitle>
           <CardDescription>
-            Acesse seus arquivos pessoais com total privacidade.
+            Privacidade total para seus arquivos pessoais.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-8">
@@ -160,7 +158,7 @@ export function AuthScreen() {
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
             <div className="relative flex justify-center text-xs uppercase text-muted-foreground">
-              <span className="bg-card px-3 font-semibold tracking-widest">Ou use e-mail e senha</span>
+              <span className="bg-card px-3 font-semibold tracking-widest">Ou e-mail e senha</span>
             </div>
           </div>
 
@@ -187,7 +185,7 @@ export function AuthScreen() {
                 <Input 
                   id="password" 
                   type="password" 
-                  placeholder="Sua senha secreta"
+                  placeholder="Senha secreta"
                   className="pl-10 h-11" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -212,14 +210,14 @@ export function AuthScreen() {
         <div className="flex items-center gap-2">
           <Settings className="h-4 w-4 text-muted-foreground" />
           <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
-            ID do Projeto no Código:
+            ID do Projeto no seu Código:
           </p>
         </div>
         <p className="font-mono font-bold text-primary text-sm bg-white px-3 py-1 rounded-md border">
           {firebaseConfig.projectId}
         </p>
         <p className="text-[9px] text-muted-foreground text-center">
-          Certifique-se de que este é o mesmo ID que aparece no topo do seu Console do Firebase.
+          Compare este ID com o que aparece na sua imagem do Console. O seu celular está mostrando configurações de um projeto com ID diferente.
         </p>
       </div>
     </div>
