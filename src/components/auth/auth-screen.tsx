@@ -31,10 +31,9 @@ export function AuthScreen() {
   };
 
   const handleAuthError = (error: any) => {
-    console.error("Auth Error:", error.code, error.message);
     if (error.code === 'auth/popup-closed-by-user') return;
 
-    if (error.code === 'auth/redirect-uri-mismatch' || error.message.includes('redirect_uri_mismatch')) {
+    if (error.code === 'auth/redirect-uri-mismatch' || error.message?.includes('redirect_uri_mismatch')) {
       setErrorInfo({
         title: "Erro de Configuração no Google",
         message: "O Google bloqueou o acesso porque os links no console dele estão com erros de digitação. Copie os links abaixo e cole no seu Console do Google Cloud.",
